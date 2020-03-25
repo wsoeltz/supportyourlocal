@@ -9,7 +9,6 @@ import fs from 'fs';
 import mongoose from 'mongoose';
 import buildDataloaders from './dataloaders';
 import schema from './graphql/schema';
-import requireLogin from './middleware/requireLogin';
 
 const app = express();
 
@@ -49,7 +48,7 @@ mongoose.connection
 const graphiql = process.env.NODE_ENV === 'development' ? true : false;
 const dataloaders = buildDataloaders();
 app.use(bodyParser.json());
-app.use('/graphql', requireLogin, expressGraphQL((req: any) => ({
+app.use('/graphql', expressGraphQL((req: any) => ({
   schema,
   graphiql,
   context: {

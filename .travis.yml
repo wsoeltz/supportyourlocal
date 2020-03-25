@@ -8,7 +8,6 @@ script:
 - npm run build
 - cd ..
 - npm run build:server
-- npm run test
 after_script:
 - rimraf node_modules
 - rimraf node_modules --prefix client

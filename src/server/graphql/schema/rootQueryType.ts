@@ -4,14 +4,8 @@ import {
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
-  // fields: () => ({
-  //   businesses: {
-  //     type: new GraphQLList(BusinessType),
-  //     resolve() {
-  //       return Mountain.find({});
-  //     },
-  //   },
-  // }),
+  fields: () => ({
+  }),
 });
 
 export default RootQuery;
