@@ -17,10 +17,14 @@ import { Routes } from './routing/routes';
 import debounce from 'lodash/debounce';
 import './styling/fonts/fonts.css';
 import Loading from './components/general/Loading';
+import { ApolloProvider } from '@apollo/react-hooks';
+import ApolloClient from 'apollo-boost';
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
 const PageNotFound = lazy(() => import('./pages/pageNotFound'));
+
+const client = new ApolloClient();
 
 export interface IAppContext {
   windowWidth: number;
@@ -55,30 +59,32 @@ function App() {
   return (
     <>
       <AppContext.Provider value={appContext}>
-        <Helmet>
-          {/* Set default meta data values */}
-          <title>{defaultMetaTitle}</title>
-          <meta name='description' content={defaultMetaDescription} />
-          <meta property='og:title' content={defaultMetaTitle} />
-          <meta property='og:description' content={defaultMetaDescription} />
-        </Helmet>
-        <Router basename={basename}>
-          <Root>
-            <GlobalStyles />
-            <Suspense fallback={<Loading />}>
-              <Switch>
-                <Route exact path={Routes.Landing}
-                  render={(props: any) => <LandingPage {...props} />}
-                />
-                <Route exact path={Routes.FirstVoucherDataDownload}
-                  render={(props: any) => <FirstVoucherDataDownload {...props} />}
-                />
-                {/* If none of the above routes are found show the 404 page */}
-                <Route component={PageNotFound} />
-              </Switch>
-            </Suspense>
-          </Root>
-        </Router>
+        <ApolloProvider client={client}>
+          <Helmet>
+            {/* Set default meta data values */}
+            <title>{defaultMetaTitle}</title>
+            <meta name='description' content={defaultMetaDescription} />
+            <meta property='og:title' content={defaultMetaTitle} />
+            <meta property='og:description' content={defaultMetaDescription} />
+          </Helmet>
+          <Router basename={basename}>
+            <Root>
+              <GlobalStyles />
+              <Suspense fallback={<Loading />}>
+                <Switch>
+                  <Route exact path={Routes.Landing}
+                    render={(props: any) => <LandingPage {...props} />}
+                  />
+                  <Route exact path={Routes.FirstVoucherDataDownload}
+                    render={(props: any) => <FirstVoucherDataDownload {...props} />}
+                  />
+                  {/* If none of the above routes are found show the 404 page */}
+                  <Route component={PageNotFound} />
+                </Switch>
+              </Suspense>
+            </Root>
+          </Router>
+        </ApolloProvider>
       </AppContext.Provider>
     </>
   );
