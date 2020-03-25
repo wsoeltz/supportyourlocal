@@ -19,6 +19,7 @@ import './styling/fonts/fonts.css';
 import Loading from './components/general/Loading';
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
+const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
 const PageNotFound = lazy(() => import('./pages/pageNotFound'));
 
 export interface IAppContext {
@@ -68,6 +69,9 @@ function App() {
               <Switch>
                 <Route exact path={Routes.Landing}
                   render={(props: any) => <LandingPage {...props} />}
+                />
+                <Route exact path={Routes.FirstVoucherDataDownload}
+                  render={(props: any) => <FirstVoucherDataDownload {...props} />}
                 />
                 {/* If none of the above routes are found show the 404 page */}
                 <Route component={PageNotFound} />

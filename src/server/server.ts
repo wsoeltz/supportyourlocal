@@ -5,7 +5,6 @@ import cors from 'cors';
 import express from 'express';
 import expressGraphQL from 'express-graphql';
 import { redirectToHTTPS } from 'express-http-to-https';
-import fs from 'fs';
 import mongoose from 'mongoose';
 import buildDataloaders from './dataloaders';
 import schema from './graphql/schema';
@@ -72,15 +71,7 @@ if (process.env.NODE_ENV === 'production') {
   // routingWithMetaData(app);
 
   app.get('*', (req, res) => {
-    const filePath = path.resolve(__dirname, '../../client', 'build', 'index.html');
-    // read in the index.html file
-    fs.readFile(filePath, 'utf8', function(err, data) {
-      if (err) {
-        return console.error(err);
-      }
-      res.send(data);
-    });
-
+    res.sendFile(path.resolve(__dirname, '../../client', 'build', 'index.html'));
   });
 }
 
