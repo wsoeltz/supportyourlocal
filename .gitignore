@@ -1,0 +1,13 @@
+node_modules
+dist
+build
+
+.env
+client/.env.development
+client/.env.production
+
+client-secret.json
+
+client/src/components/users/user-accounts.md
+
+mongodb-compass-connection-strings.md
