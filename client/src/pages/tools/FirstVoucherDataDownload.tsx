@@ -10,18 +10,18 @@ Use this page for manual gathering of the data from first voucher
 7) Add the data to the database
 **********************************/
 
-import React, {useEffect, useState} from 'react';
-import { Content } from '../../styling/Grid';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import axios from 'axios';
-import { CSVLink } from 'react-csv';
-import raw from 'raw.macro';
 import csv from 'csvtojson';
+import gql from 'graphql-tag';
+import raw from 'raw.macro';
+import React, {useEffect, useState} from 'react';
+import { CSVLink } from 'react-csv';
 import {
   Business,
   Source,
 } from '../../graphQLTypes';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { Content } from '../../styling/Grid';
 
 const GET_ALL_BUSINESSES = gql`
   query ListBusinesses {
@@ -105,29 +105,29 @@ interface BusinessRaw {
   city: string;
   country: string;
   email: string;
-  website: string | null,
+  website: string | null;
   secondaryUrl: string | null;
   logo: string | null;
-  images: string[] | null,
+  images: string[] | null;
   latitude: number;
   longitude: number;
 }
 
 interface FirstVoucherResponseDatum {
-  address: string,
-  contact: string,
-  contactCompany: string,
-  email: string,
-  salesCount: number,
-  id: string,
-  title: string,
-  url: string,
-  website: string,
-  logo: string,
-  background: string,
-  city: string,
-  industry: string,
-  fullAddress: string,
+  address: string;
+  contact: string;
+  contactCompany: string;
+  email: string;
+  salesCount: number;
+  id: string;
+  title: string;
+  url: string;
+  website: string;
+  logo: string;
+  background: string;
+  city: string;
+  industry: string;
+  fullAddress: string;
 }
 
 interface FirstVoucherAdjustedDatum {
@@ -189,14 +189,14 @@ const FirstVoucherDataDownload = () => {
             if (!graphqlData.businesses.find(
               ({externalId, source}) => source === Source.firstvoucher && externalId === d.id)
             ) {
-              appendedData.push({id: d.id, address: d.address})
+              appendedData.push({id: d.id, address: d.address});
             }
           }
-        })
+        });
         setFirstVoucherData(appendedData);
         setCompleteData(res.data);
       }
-    }
+    };
     fetchData();
 
     const geoCodedData = raw('./data/out_731491935FirstVoucherDataDownload2csv1585103589568961.csv');
@@ -204,15 +204,15 @@ const FirstVoucherDataDownload = () => {
     csv().fromString(geoCodedData).then(res => {
       const newLatLongData = res.map(row => {
         const id = row['Original Line'].split(',').shift();
-        const country = row['StandardStateorProvinceAbbrv'].split(', ').pop();
+        const country = row.StandardStateorProvinceAbbrv.split(', ').pop();
         return {
           id,
-          latitude: parseFloat(row['Latitude']),
-          longitude: parseFloat(row['Longitude']),
+          latitude: parseFloat(row.Latitude),
+          longitude: parseFloat(row.Longitude),
           country,
         };
-      })
-      setLatLongData(newLatLongData)
+      });
+      setLatLongData(newLatLongData);
     });
 
   }, [graphqlData]);
@@ -254,11 +254,11 @@ const FirstVoucherDataDownload = () => {
           images,
           latitude: targetLatLong.latitude,
           longitude: targetLatLong.longitude,
-        })
+        });
       } else {
         missingData.push(d);
       }
-    })
+    });
   }
 
   const submitData = () => {
@@ -267,7 +267,7 @@ const FirstVoucherDataDownload = () => {
         addBusiness({variables: {...datum}});
       });
     }
-  }
+  };
 
   const submitDataButton = outputData.length ? (
     <button
@@ -277,16 +277,15 @@ const FirstVoucherDataDownload = () => {
     </button>
   ) : null;
 
-
   let missingDataDownloadDataButton: React.ReactElement<any> | null;
   if (missingData && missingData.length) {
     const appendedMissingData = missingData.map((d: FirstVoucherResponseDatum) => {
       if (d && d.address && d.id) {
-        return {id: d.id, address: d.address}
+        return {id: d.id, address: d.address};
       } else {
-        return {id: '', address: ''}
+        return {id: '', address: ''};
       }
-    })
+    });
     missingDataDownloadDataButton = (
       <CSVLink
         data={appendedMissingData}

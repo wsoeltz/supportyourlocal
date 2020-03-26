@@ -2,8 +2,8 @@ import { createGlobalStyle } from 'styled-components/macro';
 import {
   baseColor,
   lightBaseColor,
-  semiBoldFontBoldWeight,
   primaryFont,
+  semiBoldFontBoldWeight,
 } from './styleUtils';
 
 const GlobalStyles = createGlobalStyle`

@@ -1,9 +1,8 @@
 import {
-  GraphQLObjectType,
   GraphQLList,
+  GraphQLObjectType,
 } from 'graphql';
 import BusinessType, { Business } from './queryTypes/businessType';
-
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',

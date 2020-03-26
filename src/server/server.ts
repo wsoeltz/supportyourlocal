@@ -61,7 +61,6 @@ if (process.env.NODE_ENV === 'production') {
 
   const path = require('path');
 
-
   // Express will serve up production assets
   // like our main.js or main.css file
   app.use(express.static('client/build'));

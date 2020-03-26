@@ -1,6 +1,5 @@
 import styled from 'styled-components/macro';
 
-
 const gridLines = {
   // Horizontal Grid Lines
   pageTop: 'countryToolsGlobalGridPageTop',

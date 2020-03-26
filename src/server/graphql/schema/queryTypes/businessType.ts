@@ -1,10 +1,10 @@
 import {
-  GraphQLID,
-  GraphQLObjectType,
-  GraphQLString,
   GraphQLFloat,
+  GraphQLID,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
+  GraphQLString,
 } from 'graphql';
 import mongoose, { Schema } from 'mongoose';
 import { Business as IBusiness } from '../../graphQLTypes';

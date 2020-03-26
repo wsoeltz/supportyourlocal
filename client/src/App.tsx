@@ -1,24 +1,24 @@
+import { ApolloProvider } from '@apollo/react-hooks';
+import ApolloClient from 'apollo-boost';
+import debounce from 'lodash/debounce';
 import React, {
-  Suspense,
   createContext,
   lazy,
-  useState,
+  Suspense,
   useEffect,
+  useState,
 } from 'react';
+import Helmet from 'react-helmet';
 import {
   BrowserRouter as Router,
   Route,
   Switch,
 } from 'react-router-dom';
-import GlobalStyles from './styling/GlobalStyles';
-import Helmet from 'react-helmet';
-import { Root } from './styling/Grid';
-import { Routes } from './routing/routes';
-import debounce from 'lodash/debounce';
-import './styling/fonts/fonts.css';
 import Loading from './components/general/Loading';
-import { ApolloProvider } from '@apollo/react-hooks';
-import ApolloClient from 'apollo-boost';
+import { Routes } from './routing/routes';
+import './styling/fonts/fonts.css';
+import GlobalStyles from './styling/GlobalStyles';
+import { Root } from './styling/Grid';
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
@@ -37,7 +37,6 @@ function App() {
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
 
   const appContext = {windowWidth};
-
 
   useEffect(() => {
     const updateWindowWidth = debounce(() => {

@@ -1,12 +1,13 @@
+/* tslint:disable:await-promise */
 import {
-  GraphQLList,
-  GraphQLString,
   GraphQLFloat,
-  GraphQLNonNull,
   GraphQLID,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLString,
 } from 'graphql';
-import BusinessType, { Business } from '../queryTypes/businessType';
 import { Business as IBusiness } from '../../graphQLTypes';
+import BusinessType, { Business } from '../queryTypes/businessType';
 
 const businessMutations: any = {
   addBusiness: {
@@ -71,7 +72,7 @@ const businessMutations: any = {
       }
     },
   },
-  
-}
+
+};
 
 export default businessMutations;

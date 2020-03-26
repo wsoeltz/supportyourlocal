@@ -12,10 +12,10 @@ export interface Business {
   city: string;
   country: string;
   email: string;
-  website: string | null,
+  website: string | null;
   secondaryUrl: string | null;
   logo: string | null;
-  images: string[] | null,
+  images: string[] | null;
   latitude: number;
   longitude: number;
 }

@@ -1,7 +1,6 @@
 import React from 'react';
 import { Content } from '../../styling/Grid';
 
-
 const PageNotFound = () => {
   return (
     <Content>
