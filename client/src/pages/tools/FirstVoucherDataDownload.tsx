@@ -38,6 +38,7 @@ const GET_ALL_BUSINESSES = gql`
       secondaryUrl
       logo
       images
+      industry
       latitude
       longitude
     }
@@ -61,6 +62,7 @@ const ADD_BUSINESS = gql`
     $secondaryUrl: String,
     $logo: String,
     $images: [String!],
+    $industry: String!,
     $latitude: Float!,
     $longitude: Float!,
   ) {
@@ -76,6 +78,7 @@ const ADD_BUSINESS = gql`
       secondaryUrl: $secondaryUrl,
       logo: $logo,
       images: $images,
+      industry: $industry,
       latitude: $latitude,
       longitude: $longitude,
     ) {
@@ -91,6 +94,7 @@ const ADD_BUSINESS = gql`
       secondaryUrl
       logo
       images
+      industry
       latitude
       longitude
     }
@@ -109,6 +113,7 @@ interface BusinessRaw {
   secondaryUrl: string | null;
   logo: string | null;
   images: string[] | null;
+  industry: string;
   latitude: number;
   longitude: number;
 }
@@ -240,6 +245,7 @@ const FirstVoucherDataDownload = () => {
       const targetLatLong = latLongData.find(lld => lld.id === d.id);
       if (targetLatLong) {
         const images = d.background ? [d.background] : [];
+        const industry = d.industry ? d.industry : 'Other';
         outputData.push({
           externalId: d.id,
           name: d.title,
@@ -252,6 +258,7 @@ const FirstVoucherDataDownload = () => {
           secondaryUrl: d.url,
           logo: d.logo,
           images,
+          industry,
           latitude: targetLatLong.latitude,
           longitude: targetLatLong.longitude,
         });

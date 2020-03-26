@@ -25,6 +25,7 @@ const BusinessSchema = new Schema({
   secondaryUrl: { type: String },
   logo: { type: String },
   images: [{ type: String }],
+  industry: { type: String },
   latitude: { type: Number },
   longitude: { type: Number },
 });
@@ -46,6 +47,7 @@ const BusinessType: any = new GraphQLObjectType({
     secondaryUrl: { type: GraphQLString },
     logo: { type: GraphQLString },
     images: { type: new GraphQLList(GraphQLString) },
+    industry: { type: GraphQLNonNull(GraphQLString) },
     latitude: { type: GraphQLNonNull(GraphQLFloat) },
     longitude: { type: GraphQLNonNull(GraphQLFloat) },
   }),

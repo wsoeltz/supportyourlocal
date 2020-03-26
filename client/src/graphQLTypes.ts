@@ -16,6 +16,7 @@ export interface Business {
   secondaryUrl: string | null;
   logo: string | null;
   images: string[] | null;
+  industry: string;
   latitude: number;
   longitude: number;
 }
