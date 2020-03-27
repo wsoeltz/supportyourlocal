@@ -1,4 +1,6 @@
+import axios from 'axios';
 import debounce from 'lodash/debounce';
+import publicIp from 'public-ip';
 import React, {
   useEffect,
   useState,
@@ -147,12 +149,35 @@ const Map = (props: Props) => {
   const coordinatesToUse = loading === true && prevData ? prevData : coordinates;
 
   const [popupInfo, setPopupInfo] = useState<Business | null>(null);
-  // const [map, setMap] = useState<any>(null);
-  const [center] = useState<[number, number] | undefined>(initialCenter);
+  const [center, setCenter] = useState<[number, number] | undefined>(initialCenter);
+
+  useEffect(() => {
+    const getUsersIpLocation = async () => {
+      try {
+        const key = process.env.REACT_APP_GEO_PLUGIN_API_KEY;
+        const res = await axios.get(
+          `https://ssl.geoplugin.net/json.gp?k=${key}`,
+        );
+        if (res && res.data && res.data.geoplugin_latitude && res.data.geoplugin_longitude) {
+          setCenter([
+            res.data.geoplugin_longitude,
+            res.data.geoplugin_latitude,
+          ]);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    getUsersIpLocation();
+  }, [setCenter]);
 
   useEffect(() => {
     if (highlighted && highlighted.length === 1) {
       setPopupInfo({...highlighted[0]});
+      setCenter([
+        highlighted[0].longitude,
+        highlighted[0].latitude,
+      ]);
     }
   }, [highlighted, setPopupInfo]);
 
