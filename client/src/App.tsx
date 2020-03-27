@@ -1,5 +1,6 @@
 import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
+import axios from 'axios';
 import debounce from 'lodash/debounce';
 import React, {
   createContext,
@@ -26,17 +27,25 @@ const PageNotFound = lazy(() => import('./pages/pageNotFound'));
 
 const client = new ApolloClient();
 
-export interface IAppContext {
-  windowWidth: number;
+interface UsersLocation {
+  latitude: number;
+  longitude: number;
+  country2LetterCode: string;
 }
 
-export const AppContext = createContext<IAppContext>({windowWidth: window.innerWidth});
+export interface IAppContext {
+  windowWidth: number;
+  userLocation: UsersLocation | null | undefined;
+}
+
+export const AppContext = createContext<IAppContext>({windowWidth: window.innerWidth, userLocation: undefined});
 
 function App() {
 
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
+  const [userLocation, setUserLocation] = useState<UsersLocation | null | undefined>(undefined);
 
-  const appContext = {windowWidth};
+  const appContext = {windowWidth, userLocation};
 
   useEffect(() => {
     const updateWindowWidth = debounce(() => {
@@ -47,6 +56,34 @@ function App() {
       window.removeEventListener('resize', updateWindowWidth);
     };
   }, []);
+
+  useEffect(() => {
+    const getUsersIpLocation = async () => {
+      try {
+        const key = process.env.REACT_APP_GEO_PLUGIN_API_KEY;
+        const res = await axios.get(
+          `https://ssl.geoplugin.net/json.gp?k=${key}`,
+        );
+        if (res && res.data &&
+            res.data.geoplugin_latitude &&
+            res.data.geoplugin_longitude &&
+            res.data.geoplugin_countryCode
+          ) {
+          setUserLocation({
+            longitude: parseFloat(res.data.geoplugin_longitude),
+            latitude: parseFloat(res.data.geoplugin_latitude),
+            country2LetterCode: res.data.geoplugin_countryCode,
+          });
+        } else {
+          setUserLocation(null);
+        }
+      } catch (e) {
+        setUserLocation(null);
+        console.error(e);
+      }
+    };
+    getUsersIpLocation();
+  }, [setUserLocation]);
 
   const defaultMetaTitle = '#supportyourlocal';
   const defaultMetaDescription = 'Support your local businesses during the COVID-19 pandemic';

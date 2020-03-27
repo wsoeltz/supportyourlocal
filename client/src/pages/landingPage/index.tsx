@@ -2,8 +2,9 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import React, {useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import styled from 'styled-components/macro';
+import { AppContext } from '../../App';
 import Map, {MapBounds} from '../../components/map';
 import SearchPanel from '../../components/searchPanel';
 import {
@@ -61,9 +62,15 @@ interface SuccessResponse {
 
 const LandingPage = () => {
 
-  const initialMapBounds = {
+  const { userLocation } = useContext(AppContext);
+
+  const initialMapBounds = !userLocation ? {
     minLong: 12.4, maxLong: 14.4, minLat: 51.4874445, maxLat: 53.4874445,
+  } : {
+    minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
+    minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
   };
+
   const initialCenter: [number, number] = [
     (initialMapBounds.maxLong + initialMapBounds.minLong) / 2,
     (initialMapBounds.maxLat + initialMapBounds.minLat) / 2,
@@ -72,6 +79,15 @@ const LandingPage = () => {
   const [mapBounds, setMapBounds] = useState<MapBounds>({...initialMapBounds});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [highlighted, setHighlighted] = useState<[Business] | undefined>(undefined);
+
+  useEffect(() => {
+    if (userLocation) {
+      setMapBounds({
+        minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
+        minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
+      });
+    }
+  }, [userLocation]);
 
   const getMapBounds = (newMapBounds: MapBounds) => {
     if (!(isEqual(newMapBounds, mapBounds))) {
@@ -82,8 +98,10 @@ const LandingPage = () => {
     variables: {...mapBounds, searchQuery},
   });
 
+  const isLoading = loading || userLocation === undefined;
+
   let coordinates: Business[];
-  if (loading) {
+  if (isLoading) {
     coordinates = [];
   } else if (error !== undefined) {
     console.error(error);
@@ -100,7 +118,7 @@ const LandingPage = () => {
       <SearchPanel
         data={coordinates}
         setSearchQuery={setSearchQuery}
-        loading={loading}
+        loading={isLoading}
         setHighlighted={setHighlighted}
       />
       <Map
@@ -109,7 +127,7 @@ const LandingPage = () => {
         mapBounds={mapBounds}
         initialCenter={initialCenter}
         highlighted={highlighted}
-        loading={loading}
+        loading={isLoading}
         key={'main-map'}
       />
     </Root>
