@@ -106,20 +106,8 @@ interface Props {
   loading: boolean;
 }
 
-const Map = (props: Props) => {
-  const {
-    coordinates, highlighted, getMapBounds,
-    initialCenter, loading,
-  } = props;
-
-  const prevData = usePrevious(coordinates);
-
-  const coordinatesToUse = loading === true && prevData ? prevData : coordinates;
-
-  const [popupInfo, setPopupInfo] = useState<Business | null>(null);
-  const [map, setMap] = useState<any>(null);
-  const [center] = useState<[number, number] | undefined>(initialCenter);
-
+const ChildMap = ({map, getMapBounds}:
+  {map: any, getMapBounds: (mapBounds: MapBounds) => void}) => {
   useEffect(() => {
     const setBounds = debounce(() => {
       const {_sw: sw, _ne: ne} = map.getBounds();
@@ -145,6 +133,22 @@ const Map = (props: Props) => {
       }
     };
   }, [map, getMapBounds]);
+  return (<></>);
+};
+
+const Map = (props: Props) => {
+  const {
+    coordinates, highlighted, getMapBounds,
+    initialCenter, loading,
+  } = props;
+
+  const prevData = usePrevious(coordinates);
+
+  const coordinatesToUse = loading === true && prevData ? prevData : coordinates;
+
+  const [popupInfo, setPopupInfo] = useState<Business | null>(null);
+  // const [map, setMap] = useState<any>(null);
+  const [center] = useState<[number, number] | undefined>(initialCenter);
 
   useEffect(() => {
     if (highlighted && highlighted.length === 1) {
@@ -254,11 +258,8 @@ const Map = (props: Props) => {
 
   }
 
-  const setMapInContext = (mapEl: any) => setMap(mapEl);
-
   const mapRenderProps = (mapEl: any) => {
-    setMapInContext(mapEl);
-    return null;
+    return <ChildMap map={mapEl} getMapBounds={getMapBounds} />;
   };
 
   return (
