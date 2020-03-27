@@ -11,7 +11,7 @@ const gridLines = {
 
 export const Root = styled.div`
   display: grid;
-  min-height: 100vh;
+  height: 100vh;
   grid-template-rows:
     [${gridLines.pageTop} ${gridLines.pageBottom}] 1fr;
 

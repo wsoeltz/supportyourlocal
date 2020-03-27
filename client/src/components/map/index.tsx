@@ -258,7 +258,7 @@ const Map = (props: Props) => {
   return (
       <Mapbox
         // eslint-disable-next-line
-        style={'mapbox://styles/supportyourlocal/ck87y26nj0mlj1ikl7ubj5kju'}
+        style={'mapbox://styles/supportyourlocal/ck89mllhy08br1iqiu6g54xha'}
         containerStyle={{
           height: '100%',
           width: '100%',

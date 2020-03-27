@@ -1,3 +1,5 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { createGlobalStyle } from 'styled-components/macro';
 import {
   baseColor,
@@ -5,6 +7,9 @@ import {
   primaryFont,
   semiBoldFontBoldWeight,
 } from './styleUtils';
+
+// Add all font awesome icons here
+library.add(faSearch);
 
 const GlobalStyles = createGlobalStyle`
   @media(max-width: 600px) {

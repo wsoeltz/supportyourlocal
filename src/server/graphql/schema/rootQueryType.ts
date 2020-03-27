@@ -3,6 +3,7 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLString,
 } from 'graphql';
 import BusinessType, { Business } from './queryTypes/businessType';
 
@@ -22,10 +23,12 @@ const RootQuery = new GraphQLObjectType({
         maxLat: { type: GraphQLNonNull(GraphQLFloat) },
         minLong: { type: GraphQLNonNull(GraphQLFloat) },
         maxLong: { type: GraphQLNonNull(GraphQLFloat) },
+        searchQuery: { type: new GraphQLNonNull(GraphQLString) },
       },
-      resolve(parentValue, { minLat, maxLat, minLong, maxLong }:
-        {minLat: number, maxLat: number, minLong: number, maxLong: number}) {
+      resolve(parentValue, { minLat, maxLat, minLong, maxLong, searchQuery }:
+        {minLat: number, maxLat: number, minLong: number, maxLong: number, searchQuery: string}) {
         return Business.find({
+          name: { $regex: searchQuery, $options: 'i' },
           latitude: { $gt: minLat, $lt: maxLat },
           longitude: { $gt: minLong, $lt: maxLong },
         });
