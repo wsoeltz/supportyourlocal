@@ -1,4 +1,4 @@
-import sortBy from 'lodash/sortBy';
+import debounce from 'lodash/debounce';
 import React, {
   useEffect,
   useState,
@@ -6,6 +6,7 @@ import React, {
 import ReactMapboxGl, {
   Feature,
   Layer,
+  MapContext,
   Popup,
   RotationControl,
   ZoomControl,
@@ -88,62 +89,62 @@ const PopupAddress = styled.div`
   grid-row: 3;
 `;
 
-const getMinMax = (coordinates: Business[]) => {
-  if (coordinates.length === 0) {
-    return { minLat: 27, maxLat: 70, minLong: -32, maxLong: 67 };
-  }
-  const sortedByLat = sortBy(coordinates, ['latitude']);
-  const sortedByLong = sortBy(coordinates, ['longitude']);
-
-  const minLat = sortedByLat[sortedByLat.length - 1].latitude;
-  const maxLat = sortedByLat[0].latitude;
-  const minLong = sortedByLong[sortedByLong.length - 1].longitude;
-  const maxLong = sortedByLong[0].longitude;
-
-  return { minLat, maxLat, minLong, maxLong };
-};
+export interface MapBounds {
+  minLat: number;
+  maxLat: number;
+  minLong: number;
+  maxLong: number;
+}
 
 interface Props {
   coordinates: Business[];
   highlighted?: Business[];
+  mapBounds: MapBounds;
+  getMapBounds: (mapBounds: MapBounds) => void;
+  initialCenter: [number, number] | undefined;
 }
 
 const Map = (props: Props) => {
   const {
-    coordinates, highlighted,
+    coordinates, highlighted, getMapBounds,
+    initialCenter,
   } = props;
 
-  const { minLat, maxLat, minLong, maxLong } = getMinMax(coordinates);
-
-  let initialCenter: [number, number];
-  if (highlighted && highlighted.length === 1) {
-    initialCenter = [highlighted[0].longitude, highlighted[0].latitude];
-  } else if (coordinates.length) {
-    initialCenter = [(maxLong + minLong) / 2, (maxLat + minLat) / 2];
-  } else {
-    initialCenter = [-13.40495, 52.52001];
-  }
-
   const [popupInfo, setPopupInfo] = useState<Business | null>(null);
-
-  const [center, setCenter] = useState<[number, number]>(initialCenter);
-  const [fitBounds, setFitBounds] =
-    useState<[[number, number], [number, number]] | undefined>([[minLong, minLat], [maxLong, maxLat]]);
+  const [map, setMap] = useState<any>(null);
+  const [center] = useState<[number, number] | undefined>(initialCenter);
 
   useEffect(() => {
-    const coords = getMinMax(coordinates);
-    setFitBounds([[coords.minLong, coords.minLat], [coords.maxLong, coords.maxLat]]);
-  }, [coordinates]);
+    const setBounds = debounce(() => {
+      const {_sw: sw, _ne: ne} = map.getBounds();
+      const newMinLat = sw.lat > ne.lat ? ne.lat : sw.lat;
+      const newMaxLat = sw.lat < ne.lat ? ne.lat : sw.lat;
+      const newMinLong = sw.lng > ne.lng ? ne.lng : sw.lng;
+      const newMaxLong = sw.lng < ne.lng ? ne.lng : sw.lng;
+      getMapBounds({
+        minLat: newMinLat,
+        maxLat: newMaxLat,
+        minLong: newMinLong,
+        maxLong: newMaxLong,
+      });
+    }, 500);
+    if (map) {
+      map.on('dragend', setBounds);
+      map.on('zoomend', setBounds);
+    }
+    return () => {
+     if (map) {
+        map.off('dragend', setBounds);
+        map.off('zoomend', setBounds);
+      }
+    };
+  }, [map, getMapBounds]);
 
   useEffect(() => {
     if (highlighted && highlighted.length === 1) {
       setPopupInfo({...highlighted[0]});
-      setCenter([highlighted[0].longitude, highlighted[0].latitude]);
-    } else if (coordinates.length === 1) {
-      setPopupInfo({...coordinates[0]});
-      setCenter([coordinates[0].longitude, coordinates[0].latitude]);
     }
-  }, [highlighted, setPopupInfo, setCenter, coordinates]);
+  }, [highlighted, setPopupInfo]);
 
   const togglePointer = (mapEl: any, cursor: string) => {
     mapEl.getCanvas().style.cursor = cursor;
@@ -152,7 +153,6 @@ const Map = (props: Props) => {
   const features = coordinates.map(point => {
     const onClick = () => {
       setPopupInfo({...point});
-      setCenter([point.longitude, point.latitude]);
     };
     return (
       <Feature
@@ -248,8 +248,14 @@ const Map = (props: Props) => {
 
   }
 
+  const setMapInContext = (mapEl: any) => setMap(mapEl);
+
+  const mapRenderProps = (mapEl: any) => {
+    setMapInContext(mapEl);
+    return null;
+  };
+
   return (
-    <>
       <Mapbox
         // eslint-disable-next-line
         style={'mapbox://styles/supportyourlocal/ck87y26nj0mlj1ikl7ubj5kju'}
@@ -259,9 +265,9 @@ const Map = (props: Props) => {
         }}
         center={center}
         onClick={() => setPopupInfo(null)}
-        fitBounds={fitBounds}
         fitBoundsOptions={{padding: 50, linear: true}}
-        movingMethod={'flyTo'}
+        movingMethod={'jumpTo'}
+        key={`mapkey`}
       >
         <ZoomControl />
         <RotationControl style={{ top: 80 }} />
@@ -282,8 +288,8 @@ const Map = (props: Props) => {
           {features}
         </Layer>
         {popup}
+        <MapContext.Consumer children={mapRenderProps} />
       </Mapbox>
-    </>
   );
 
 };
