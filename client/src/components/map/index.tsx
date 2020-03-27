@@ -20,6 +20,8 @@ import usePrevious from '../../hooks/usePrevious';
 import {
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
+import mapboxgl from 'mapbox-gl';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
 
@@ -104,10 +106,14 @@ interface Props {
   getMapBounds: (mapBounds: MapBounds) => void;
   initialCenter: [number, number] | undefined;
   loading: boolean;
+  geocoderSearchElm: HTMLElement | null;
 }
 
-const ChildMap = ({map, getMapBounds}:
-  {map: any, getMapBounds: (mapBounds: MapBounds) => void}) => {
+const ChildMap = ({map, getMapBounds, geocoderSearchElm}:
+  {map: any, getMapBounds: (mapBounds: MapBounds) => void, geocoderSearchElm: HTMLElement | null}) => {
+
+  const [hasGeoCoder, setHasGeoCoder] = useState<boolean>(false);
+
   useEffect(() => {
     const setBounds = debounce(() => {
       const {_sw: sw, _ne: ne} = map.getBounds();
@@ -125,6 +131,15 @@ const ChildMap = ({map, getMapBounds}:
     if (map) {
       map.on('dragend', setBounds);
       map.on('zoomend', setBounds);
+      if (geocoderSearchElm && !hasGeoCoder) {
+        const geocoder = new MapboxGeocoder({
+          accessToken: accessToken,
+          mapboxgl: mapboxgl,
+          placeholder: 'Find a location'
+        });
+        geocoderSearchElm.appendChild(geocoder.onAdd(map));
+        setHasGeoCoder(true);
+      }
     }
     return () => {
      if (map) {
@@ -132,14 +147,14 @@ const ChildMap = ({map, getMapBounds}:
         map.off('zoomend', setBounds);
       }
     };
-  }, [map, getMapBounds]);
+  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder]);
   return (<></>);
 };
 
 const Map = (props: Props) => {
   const {
     coordinates, highlighted, getMapBounds,
-    initialCenter, loading,
+    initialCenter, loading, geocoderSearchElm,
   } = props;
 
   const prevData = usePrevious(coordinates);
@@ -272,7 +287,7 @@ const Map = (props: Props) => {
   }
 
   const mapRenderProps = (mapEl: any) => {
-    return <ChildMap map={mapEl} getMapBounds={getMapBounds} />;
+    return <ChildMap map={mapEl} getMapBounds={getMapBounds} geocoderSearchElm={geocoderSearchElm} />;
   };
 
   return (
@@ -286,7 +301,7 @@ const Map = (props: Props) => {
         center={center}
         onClick={() => setPopupInfo(null)}
         fitBoundsOptions={{padding: 50, linear: true}}
-        movingMethod={'jumpTo'}
+        movingMethod={'flyTo'}
         key={`mapkey`}
       >
         <ZoomControl />

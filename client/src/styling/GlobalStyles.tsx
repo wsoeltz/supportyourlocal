@@ -1,5 +1,9 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import {
+  faSearch,
+  faMapMarkerAlt,
+  faStreetView,
+} from '@fortawesome/free-solid-svg-icons';
 import { createGlobalStyle } from 'styled-components/macro';
 import {
   baseColor,
@@ -9,7 +13,7 @@ import {
 } from './styleUtils';
 
 // Add all font awesome icons here
-library.add(faSearch);
+library.add(faSearch, faMapMarkerAlt, faStreetView);
 
 const GlobalStyles = createGlobalStyle`
   @media(max-width: 600px) {

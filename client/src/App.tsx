@@ -20,6 +20,7 @@ import { Routes } from './routing/routes';
 import './styling/fonts/fonts.css';
 import GlobalStyles from './styling/GlobalStyles';
 import { Root } from './styling/Grid';
+import noop from 'lodash/noop';
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
@@ -36,16 +37,21 @@ interface UsersLocation {
 export interface IAppContext {
   windowWidth: number;
   userLocation: UsersLocation | null | undefined;
+  setUserLocation: (value: UsersLocation | null | undefined) => void;
 }
 
-export const AppContext = createContext<IAppContext>({windowWidth: window.innerWidth, userLocation: undefined});
+export const AppContext = createContext<IAppContext>({
+  windowWidth: window.innerWidth,
+  userLocation: undefined,
+  setUserLocation: noop,
+});
 
 function App() {
 
   const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth);
   const [userLocation, setUserLocation] = useState<UsersLocation | null | undefined>(undefined);
 
-  const appContext = {windowWidth, userLocation};
+  const appContext = {windowWidth, userLocation, setUserLocation};
 
   useEffect(() => {
     const updateWindowWidth = debounce(() => {

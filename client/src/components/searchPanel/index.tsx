@@ -3,17 +3,14 @@ import styled from 'styled-components/macro';
 import { Business, Source } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor, tertiaryColor } from '../../styling/styleUtils';
-import StandardSearch from './StandardSearch';
 
 const primaryColor = '#215890';
-const secondaryColor = '#fbd897';
 
 const Root = styled.div`
   height: 100%;
   overflow: hidden;
   display: grid;
-  grid-template-rows: auto auto 1fr;
-  box-shadow: 1px 0px 2px 0px rgba(0, 0, 0, 0.2);
+  grid-template-rows: 1fr;
   position: relative;
   z-index: 10;
 `;
@@ -84,31 +81,6 @@ const LinkButton = styled.a`
   }
 `;
 
-const HeadingContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: ${secondaryColor};
-`;
-
-const HeadingLogo = styled.h1`
-  display: inline-block;
-  margin-top: 1.5rem;
-  padding: 15px 20px;
-  background-color: #000;
-  transform: rotate(-3deg);
-  color: #fff;
-  font-size: 40px;
-  line-height: 46px;
-  text-align: center;
-  font-family: Montserrat, sans-serif;
-`;
-
-const SearchContainer = styled.div`
-  padding: 0 1rem 1rem;
-  background-color: ${secondaryColor};
-`;
-
 const NoResults = styled.p`
   padding: 1rem;
   text-align: center;
@@ -118,12 +90,11 @@ const NoResults = styled.p`
 interface Props {
   loading: boolean;
   data: Business[];
-  setSearchQuery: (value: string) => void;
   setHighlighted: (value: [Business]) => void;
 }
 
 const SearchPanel = (props: Props) => {
-  const {data, setSearchQuery, loading, setHighlighted} = props;
+  const {data, loading, setHighlighted} = props;
 
   const prevData = usePrevious(data);
 
@@ -133,7 +104,7 @@ const SearchPanel = (props: Props) => {
   if (!dataToUse || !dataToUse.length) {
     content = (
       <NoResults>
-        <em>Couldn't find any results in this location</em>
+        <em>Sorry, we couldn't find any results in this location</em>
       </NoResults>
     );
   } else {
@@ -209,17 +180,6 @@ const SearchPanel = (props: Props) => {
 
   return (
     <Root>
-      <HeadingContainer>
-        <div><HeadingLogo>#supportyourlocal</HeadingLogo></div>
-      </HeadingContainer>
-      <SearchContainer>
-        <StandardSearch
-          placeholder={'Search this area'}
-          initialQuery={''}
-          setSearchQuery={setSearchQuery}
-          focusOnMount={false}
-        />
-      </SearchContainer>
       {content}
     </Root>
   );
