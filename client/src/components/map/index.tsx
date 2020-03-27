@@ -1,4 +1,6 @@
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import debounce from 'lodash/debounce';
+import mapboxgl from 'mapbox-gl';
 import React, {
   useEffect,
   useState,
@@ -20,8 +22,6 @@ import usePrevious from '../../hooks/usePrevious';
 import {
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
-import mapboxgl from 'mapbox-gl';
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
 
@@ -133,9 +133,9 @@ const ChildMap = ({map, getMapBounds, geocoderSearchElm}:
       map.on('zoomend', setBounds);
       if (geocoderSearchElm && !hasGeoCoder) {
         const geocoder = new MapboxGeocoder({
-          accessToken: accessToken,
-          mapboxgl: mapboxgl,
-          placeholder: 'Find a location'
+          accessToken,
+          mapboxgl,
+          placeholder: 'Find a location',
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
         setHasGeoCoder(true);

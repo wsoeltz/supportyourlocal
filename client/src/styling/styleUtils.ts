@@ -6,7 +6,8 @@ export const lightBorderColor = '#dcdcdc'; // really light gray color for subtle
 
 export const tertiaryColor = '#f3f3f3'; // really light gray color for use as a hover background color on cards
 
-export const primaryFont = "'Source Sans Pro', sans-serif";
+export const primaryFont = 'Montserrat,sans-serif';
+// export const primaryFont = "'Source Sans Pro', sans-serif";
 export const secondaryFont = "'OfficeCodeProWeb', monospace";
 
 export const semiBoldFontBoldWeight = 600;

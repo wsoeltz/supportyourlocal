@@ -1,10 +1,13 @@
+import {
+  faMapMarkerAlt,
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {darken} from 'polished';
 import React from 'react';
 import styled from 'styled-components/macro';
-import { Business, Source } from '../../graphQLTypes';
+import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
-import { lightBorderColor, tertiaryColor } from '../../styling/styleUtils';
-
-const primaryColor = '#215890';
+import { lightBorderColor } from '../../styling/styleUtils';
 
 const Root = styled.div`
   height: 100%;
@@ -16,7 +19,7 @@ const Root = styled.div`
 `;
 
 const ScrollContainer = styled.div`
-  padding: 1rem;
+  padding: 0 1rem;
   height: 100%;
   overflow: auto;
   box-sizing: border-box;
@@ -24,60 +27,47 @@ const ScrollContainer = styled.div`
 
 const Card = styled.div`
   box-sizing: border-box;
-  padding: 2rem 0;
+  padding: 0.8rem 0 1.3rem;
   border-bottom: solid 1px ${lightBorderColor};
-  background-color: #fff;
-
-  &:hover {
-    cursor: pointer;
-    background-color: ${tertiaryColor};
-  }
+  position: relative;
 `;
 
 const TitleContainer = styled.div`
   display: grid;
-  grid-template-columns: 1fr auto;
   grid-column-gap: 0.5rem;
-  margin-bottom: 0.85rem;
+  padding-right: 1rem;
 `;
 
 const Title = styled.h4`
-  font-size: 1.2rem;
+  font-size: 1rem;
   margin-top: 0;
   margin-bottom: 0.5rem;
 `;
 
-const LogoContainer = styled.div`
-  width: 180px;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const Logo = styled.img`
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+const Info = styled.p`
+  font-size: 0.9rem;
+  color: #666;
 `;
 
 const LinkContainer = styled.div`
-  display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
-  grid-column-gap: 0.7rem;
 `;
 
 const LinkButton = styled.a`
   padding: 0.3rem 0.4rem;
-  border: solid 1px ${primaryColor};
-  color: ${primaryColor};
+  background-color: #b2b2b2;
+  color: #fff;
   text-decoration: none;
   text-transform: capitalize;
   text-align: center;
   font-size: 0.75rem;
+  border-radius: 5px;
 
   &:hover {
-    background-color: ${primaryColor};
-    color: #fff;
+    background-color: ${darken(0.1, '#b2b2b2')};
+  }
+
+  &:not(:last-child) {
+    margin-right: 0.6rem;
   }
 `;
 
@@ -85,6 +75,15 @@ const NoResults = styled.p`
   padding: 1rem;
   text-align: center;
   color: #666;
+`;
+
+const ShowOnMap = styled.button`
+  position: absolute;
+  top: 0.5rem;
+  right: -0.4rem;
+  background-color: transparent;
+  color: #215890;
+  font-size: 1rem;
 `;
 
 interface Props {
@@ -110,19 +109,9 @@ const SearchPanel = (props: Props) => {
   } else {
     const cards = dataToUse.map(d => {
       const {
-        name, source, address, email, website,
-        secondaryUrl, logo,
+        name, address, website,
+        secondaryUrl, industry,
       } = d;
-      let logoImg: React.ReactElement<any> | null;
-      if (logo) {
-        if (logo.match(/\.(jpeg|jpg|gif|png)$/) !== null) {
-          logoImg = <LogoContainer><Logo src={logo} alt={name} /></LogoContainer>;
-        } else {
-          logoImg = null;
-        }
-      } else {
-        logoImg = null;
-      }
       const websiteLink = website
         ? (
             <LinkButton
@@ -136,42 +125,35 @@ const SearchPanel = (props: Props) => {
         : null;
       let secondaryLink: React.ReactElement<any> | null;
       if (secondaryUrl) {
-        secondaryLink = source === Source.firstvoucher
-          ? (
+        secondaryLink = (
               <LinkButton
-                href={secondaryUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                First Voucher Page
-              </LinkButton>
-            )
-          : (
-              <LinkButton
-                href={secondaryUrl}
-                target='_blank'
-                rel='noopener noreferrer'
-              >
-                {secondaryUrl}
-              </LinkButton>
-            );
+            href={secondaryUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+          >
+            Visit Voucher Shop
+          </LinkButton>
+        );
       } else {
         secondaryLink = null;
       }
       return (
-        <Card onClick={() => setHighlighted([d])} key={d.id}>
+        <Card key={d.id}>
           <TitleContainer>
-            <div>
-              <Title>{d.name}</Title>
-              <p>{address}</p>
-            </div>
-            {logoImg}
+            <Title>{name}</Title>
+            <Info>
+              {industry}
+              <br />
+              {address}
+            </Info>
           </TitleContainer>
           <LinkContainer>
             {secondaryLink}
             {websiteLink}
-            <LinkButton href={'mailto:' + email}>email</LinkButton>
           </LinkContainer>
+          <ShowOnMap onClick={() => setHighlighted([d])}>
+            <FontAwesomeIcon icon={faMapMarkerAlt} />
+          </ShowOnMap>
         </Card>
       );
     });

@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/react-hooks';
 import ApolloClient from 'apollo-boost';
 import axios from 'axios';
 import debounce from 'lodash/debounce';
+import noop from 'lodash/noop';
 import React, {
   createContext,
   lazy,
@@ -20,7 +21,6 @@ import { Routes } from './routing/routes';
 import './styling/fonts/fonts.css';
 import GlobalStyles from './styling/GlobalStyles';
 import { Root } from './styling/Grid';
-import noop from 'lodash/noop';
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));

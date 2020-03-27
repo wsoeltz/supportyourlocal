@@ -1,23 +1,23 @@
 import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
-import isEqual from 'lodash/isEqual';
-import sortBy from 'lodash/sortBy';
-import React, {useContext, useEffect, useState, useRef} from 'react';
-import styled, {keyframes} from 'styled-components/macro';
-import { AppContext } from '../../App';
-import Map, {MapBounds} from '../../components/map';
-import SearchPanel from '../../components/searchPanel';
-import {
-  Business,
-} from '../../graphQLTypes';
-import { Content } from '../../styling/Grid';
-import StandardSearch from '../../components/searchPanel/StandardSearch';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMapMarkerAlt,
   faStreetView,
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import gql from 'graphql-tag';
+import isEqual from 'lodash/isEqual';
+import sortBy from 'lodash/sortBy';
 import {lighten} from 'polished';
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import styled, {keyframes} from 'styled-components/macro';
+import { AppContext } from '../../App';
+import Map, {MapBounds} from '../../components/map';
+import SearchPanel from '../../components/searchPanel';
+import StandardSearch from '../../components/searchPanel/StandardSearch';
+import {
+  Business,
+} from '../../graphQLTypes';
+import { Content } from '../../styling/Grid';
 
 const primaryBackgroundColor = '#f3f3f3';
 const primaryColor = '#215890';
@@ -91,8 +91,8 @@ const GeoCoderSearch = styled.div`
     animation-name: ${spinAnimation};
     animation-duration: 200ms;
     animation-iteration-count: infinite;
-    animation-timing-function: linear; 
-  }  
+    animation-timing-function: linear;
+  }
 
   .mapboxgl-ctrl-geocoder--icon-close {
     fill: #999;
@@ -206,6 +206,27 @@ const SearchContainer = styled.div`
   background-color: ${primaryBackgroundColor};
 `;
 
+const NavLinks = styled.nav`
+  flex-grow: 1;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+`;
+
+const NavLink = styled.a`
+  margin-right: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  border-bottom: solid 1px transparent;
+  font-size: 0.9rem;
+  text-decoration: none;
+
+  &:hover {
+    border-bottom-color: #333;
+  }
+`;
+
 const FooterContainer = styled.div`
   background-color: ${primaryBackgroundColor};
   box-shadow: 0px -2px 6px -2px rgba(0,0,0,0.2);
@@ -239,6 +260,7 @@ const SEARCH_BUSINESSES = gql`
       secondaryUrl
       logo
       images
+      industry
       latitude
       longitude
     }
@@ -281,7 +303,7 @@ const LandingPage = () => {
         minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
         minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
       });
-      setCenter([userLocation.longitude, userLocation.latitude])
+      setCenter([userLocation.longitude, userLocation.latitude]);
     }
   }, [userLocation]);
 
@@ -289,9 +311,9 @@ const LandingPage = () => {
 
   useEffect(() => {
     if (geocoderSearchElmRef && geocoderSearchElmRef.current) {
-      setGeocoderSearchElm(geocoderSearchElmRef.current)
+      setGeocoderSearchElm(geocoderSearchElmRef.current);
     }
-  }, [geocoderSearchElmRef, setGeocoderSearchElm])
+  }, [geocoderSearchElmRef, setGeocoderSearchElm]);
 
   const getMapBounds = (newMapBounds: MapBounds) => {
     if (!(isEqual(newMapBounds, mapBounds))) {
@@ -330,12 +352,29 @@ const LandingPage = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(onSuccess, onError);
     }
-  }
+  };
 
   return (
     <Root>
       <HeadingContainer>
         <div><HeadingLogo>#supportyourlocal</HeadingLogo></div>
+        <NavLinks>
+          <NavLink
+            href={'https://www.supportyourlocal.online/'}
+          >
+            Mission
+          </NavLink>
+          <NavLink
+            href={'https://www.supportyourlocal.online/shop-eintragen'}
+          >
+            For Shop Owners
+          </NavLink>
+          <NavLink
+            href={'https://www.supportyourlocal.online/ueber'}
+          >
+            About
+          </NavLink>
+        </NavLinks>
       </HeadingContainer>
 
       <ContentContainer>
@@ -378,6 +417,28 @@ const LandingPage = () => {
       </ContentContainer>
 
       <FooterContainer>
+        <NavLinks>
+          <NavLink
+            href={'https://www.supportyourlocal.online/presse'}
+          >
+            Press
+          </NavLink>
+          <NavLink
+            href={'https://www.supportyourlocal.online/kontakt'}
+          >
+            Contact
+          </NavLink>
+          <NavLink
+            href={'https://www.supportyourlocal.online/datenschutz'}
+          >
+            Data Privacy
+          </NavLink>
+          <NavLink
+            href={'https://www.supportyourlocal.online/impressum'}
+          >
+            Imprint
+          </NavLink>
+        </NavLinks>
       </FooterContainer>
     </Root>
   );
