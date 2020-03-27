@@ -109,6 +109,12 @@ const SearchContainer = styled.div`
   background-color: ${secondaryColor};
 `;
 
+const NoResults = styled.p`
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+`;
+
 interface Props {
   loading: boolean;
   data: Business[];
@@ -126,9 +132,9 @@ const SearchPanel = (props: Props) => {
   let content: React.ReactElement<any> | null;
   if (!dataToUse || !dataToUse.length) {
     content = (
-      <p>
+      <NoResults>
         <em>Couldn't find any results in this location</em>
-      </p>
+      </NoResults>
     );
   } else {
     const cards = dataToUse.map(d => {
