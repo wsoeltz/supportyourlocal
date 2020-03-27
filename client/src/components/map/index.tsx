@@ -16,6 +16,7 @@ import {
   Business,
   Source,
 } from '../../graphQLTypes';
+import usePrevious from '../../hooks/usePrevious';
 import {
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
@@ -102,13 +103,18 @@ interface Props {
   mapBounds: MapBounds;
   getMapBounds: (mapBounds: MapBounds) => void;
   initialCenter: [number, number] | undefined;
+  loading: boolean;
 }
 
 const Map = (props: Props) => {
   const {
     coordinates, highlighted, getMapBounds,
-    initialCenter,
+    initialCenter, loading,
   } = props;
+
+  const prevData = usePrevious(coordinates);
+
+  const coordinatesToUse = loading === true && prevData ? prevData : coordinates;
 
   const [popupInfo, setPopupInfo] = useState<Business | null>(null);
   const [map, setMap] = useState<any>(null);
@@ -150,7 +156,7 @@ const Map = (props: Props) => {
     mapEl.getCanvas().style.cursor = cursor;
   };
 
-  const features = coordinates.map(point => {
+  const features = coordinatesToUse.map(point => {
     const onClick = () => {
       setPopupInfo({...point});
     };

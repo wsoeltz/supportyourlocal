@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 import { Business, Source } from '../../graphQLTypes';
+import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor, tertiaryColor } from '../../styling/styleUtils';
 import StandardSearch from './StandardSearch';
 
@@ -118,17 +119,19 @@ interface Props {
 const SearchPanel = (props: Props) => {
   const {data, setSearchQuery, loading, setHighlighted} = props;
 
+  const prevData = usePrevious(data);
+
+  const dataToUse = loading === true ? prevData : data;
+
   let content: React.ReactElement<any> | null;
-  if (loading) {
-    content = null;
-  } else if (!data || !data.length) {
+  if (!dataToUse || !dataToUse.length) {
     content = (
       <p>
         <em>Couldn't find any results in this location</em>
       </p>
     );
   } else {
-    const cards = data.map(d => {
+    const cards = dataToUse.map(d => {
       const {
         name, source, address, email, website,
         secondaryUrl, logo,
@@ -179,7 +182,7 @@ const SearchPanel = (props: Props) => {
         secondaryLink = null;
       }
       return (
-        <Card onClick={() => setHighlighted([d])}>
+        <Card onClick={() => setHighlighted([d])} key={d.id}>
           <TitleContainer>
             <div>
               <Title>{d.name}</Title>

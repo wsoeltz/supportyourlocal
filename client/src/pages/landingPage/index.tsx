@@ -109,6 +109,7 @@ const LandingPage = () => {
         mapBounds={mapBounds}
         initialCenter={initialCenter}
         highlighted={highlighted}
+        loading={loading}
         key={'main-map'}
       />
     </Root>
