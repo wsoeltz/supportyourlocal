@@ -59,6 +59,7 @@ function App() {
 
   useEffect(() => {
     const getUsersIpLocation = async () => {
+      console.log(process.env.REACT_APP_GEO_PLUGIN_API_KEY);
       try {
         const key = process.env.REACT_APP_GEO_PLUGIN_API_KEY;
         const res = await axios.get(
