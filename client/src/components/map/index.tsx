@@ -1,7 +1,9 @@
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import { GetString } from 'fluent-react/compat';
 import debounce from 'lodash/debounce';
 import mapboxgl from 'mapbox-gl';
 import React, {
+  useContext,
   useEffect,
   useState,
 } from 'react';
@@ -14,6 +16,9 @@ import ReactMapboxGl, {
   ZoomControl,
 } from 'react-mapbox-gl';
 import styled from 'styled-components';
+import {
+  AppLocalizationAndBundleContext,
+} from '../../contextProviders/getFluentLocalizationContext';
 import {
   Business,
   Source,
@@ -109,8 +114,14 @@ interface Props {
   geocoderSearchElm: HTMLElement | null;
 }
 
-const ChildMap = ({map, getMapBounds, geocoderSearchElm}:
-  {map: any, getMapBounds: (mapBounds: MapBounds) => void, geocoderSearchElm: HTMLElement | null}) => {
+interface MapUtilProps {
+  map: any;
+  getMapBounds: (mapBounds: MapBounds) => void;
+  geocoderSearchElm: HTMLElement | null;
+  getFluentString: GetString;
+}
+
+const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUtilProps) => {
 
   const [hasGeoCoder, setHasGeoCoder] = useState<boolean>(false);
 
@@ -135,7 +146,8 @@ const ChildMap = ({map, getMapBounds, geocoderSearchElm}:
         const geocoder = new MapboxGeocoder({
           accessToken,
           mapboxgl,
-          placeholder: 'Find a location',
+          placeholder: getFluentString('ui-text-find-a-location'),
+          language: navigator.language,
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
         setHasGeoCoder(true);
@@ -147,7 +159,7 @@ const ChildMap = ({map, getMapBounds, geocoderSearchElm}:
         map.off('zoomend', setBounds);
       }
     };
-  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder]);
+  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString]);
   return (<></>);
 };
 
@@ -156,6 +168,9 @@ const Map = (props: Props) => {
     coordinates, highlighted, getMapBounds,
     initialCenter, loading, geocoderSearchElm,
   } = props;
+
+  const {localization} = useContext(AppLocalizationAndBundleContext);
+  const getFluentString: GetString = (...args) => localization.getString(...args);
 
   const prevData = usePrevious(coordinates);
   const prevInitialCenter = usePrevious(initialCenter);
@@ -211,7 +226,7 @@ const Map = (props: Props) => {
     popup = <></>;
   } else {
     const {
-      name, source, address, email, website,
+      name, source, address, website,
       secondaryUrl, logo,
     } = popupInfo;
     let logoImg: React.ReactElement<any> | null;
@@ -231,7 +246,7 @@ const Map = (props: Props) => {
             target='_blank'
             rel='noopener noreferrer'
           >
-            View Website
+            {getFluentString('ui-text-view-website')}
           </LinkButton>
         )
       : null;
@@ -244,7 +259,7 @@ const Map = (props: Props) => {
               target='_blank'
               rel='noopener noreferrer'
             >
-              First Voucher Page
+              {getFluentString('ui-text-visit-voucher-shop')}
             </LinkButton>
           )
         : (
@@ -273,7 +288,6 @@ const Map = (props: Props) => {
             <PopupLinks>
               {secondaryLink}
               {websiteLink}
-              <LinkButton href={'mailto:' + email}>email</LinkButton>
             </PopupLinks>
             <PopupAddress>
               {address}
@@ -287,7 +301,14 @@ const Map = (props: Props) => {
   }
 
   const mapRenderProps = (mapEl: any) => {
-    return <ChildMap map={mapEl} getMapBounds={getMapBounds} geocoderSearchElm={geocoderSearchElm} />;
+    return (
+      <MapUtil
+        map={mapEl}
+        getMapBounds={getMapBounds}
+        geocoderSearchElm={geocoderSearchElm}
+        getFluentString={getFluentString}
+      />
+    );
   };
 
   return (

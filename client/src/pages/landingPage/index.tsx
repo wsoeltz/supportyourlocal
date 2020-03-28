@@ -4,16 +4,21 @@ import {
   faStreetView,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import {lighten} from 'polished';
 import React, {useContext, useEffect, useRef, useState} from 'react';
+import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
 import Map, {MapBounds} from '../../components/map';
 import SearchPanel from '../../components/searchPanel';
 import StandardSearch from '../../components/searchPanel/StandardSearch';
+import {
+  AppLocalizationAndBundleContext,
+} from '../../contextProviders/getFluentLocalizationContext';
 import {
   Business,
 } from '../../graphQLTypes';
@@ -276,8 +281,10 @@ interface SuccessResponse {
 }
 
 const LandingPage = () => {
-
   const { userLocation, setUserLocation } = useContext(AppContext);
+
+  const {localization} = useContext(AppLocalizationAndBundleContext);
+  const getFluentString: GetString = (...args) => localization.getString(...args);
 
   const initialMapBounds = !userLocation ? {
     minLong: 12.4, maxLong: 14.4, minLat: 51.4874445, maxLat: 53.4874445,
@@ -341,10 +348,8 @@ const LandingPage = () => {
 
   const getUsersLocation = () => {
     const onSuccess = ({coords: {latitude, longitude}}: Position) => {
-      const country2LetterCode =
-        userLocation && userLocation.country2LetterCode ? userLocation.country2LetterCode : '';
       setCenter([longitude + (Math.random() * 0.00001), latitude + (Math.random() * 0.00001)]);
-      setUserLocation({country2LetterCode, latitude, longitude});
+      setUserLocation({latitude, longitude});
     };
     const onError = () => {
       console.error('Unable to retrieve your location');
@@ -354,93 +359,105 @@ const LandingPage = () => {
     }
   };
 
+  const defaultMetaTitle = getFluentString('meta-data-base-title');
+  const defaultMetaDescription = getFluentString('meta-data-base-description');
+
   return (
-    <Root>
-      <HeadingContainer>
-        <div><HeadingLogo>#supportyourlocal</HeadingLogo></div>
-        <NavLinks>
-          <NavLink
-            href={'https://www.supportyourlocal.online/'}
-          >
-            Mission
-          </NavLink>
-          <NavLink
-            href={'https://www.supportyourlocal.online/shop-eintragen'}
-          >
-            For Shop Owners
-          </NavLink>
-          <NavLink
-            href={'https://www.supportyourlocal.online/ueber'}
-          >
-            About
-          </NavLink>
-        </NavLinks>
-      </HeadingContainer>
+    <>
+      <Helmet>
+        {/* Set default meta data values */}
+        <title>{defaultMetaTitle}</title>
+        <meta name='description' content={defaultMetaDescription} />
+        <meta property='og:title' content={defaultMetaTitle} />
+        <meta property='og:description' content={defaultMetaDescription} />
+      </Helmet>
+      <Root>
+        <HeadingContainer>
+          <div><HeadingLogo>{defaultMetaTitle}</HeadingLogo></div>
+          <NavLinks>
+            <NavLink
+              href={'https://www.supportyourlocal.online/'}
+            >
+              {getFluentString('navigation-links-mission')}
+            </NavLink>
+            <NavLink
+              href={'https://www.supportyourlocal.online/shop-eintragen'}
+            >
+              {getFluentString('navigation-links-for-shop-owners')}
+            </NavLink>
+            <NavLink
+              href={'https://www.supportyourlocal.online/ueber'}
+            >
+              {getFluentString('navigation-links-about')}
+            </NavLink>
+          </NavLinks>
+        </HeadingContainer>
 
-      <ContentContainer>
+        <ContentContainer>
 
-        <SearchAndResultsContainer>
-          <GeoCoderSearchContainer>
-            <GeoCoderSearch ref={geocoderSearchElmRef}>
-              <LocationIcon icon={faMapMarkerAlt} />
-            </GeoCoderSearch>
-            <UseMyLocation onClick={getUsersLocation}>
-              <FontAwesomeIcon icon={faStreetView} />
-            </UseMyLocation>
-          </GeoCoderSearchContainer>
-          <SearchContainer>
-            <StandardSearch
-              placeholder={'Search for a shop in this area'}
-              initialQuery={''}
-              setSearchQuery={setSearchQuery}
-              focusOnMount={false}
+          <SearchAndResultsContainer>
+            <GeoCoderSearchContainer>
+              <GeoCoderSearch ref={geocoderSearchElmRef}>
+                <LocationIcon icon={faMapMarkerAlt} />
+              </GeoCoderSearch>
+              <UseMyLocation onClick={getUsersLocation}>
+                <FontAwesomeIcon icon={faStreetView} />
+              </UseMyLocation>
+            </GeoCoderSearchContainer>
+            <SearchContainer>
+              <StandardSearch
+                placeholder={getFluentString('ui-text-search-for-a-shop-placegholer')}
+                initialQuery={''}
+                setSearchQuery={setSearchQuery}
+                focusOnMount={false}
+              />
+            </SearchContainer>
+            <SearchPanel
+              data={coordinates}
+              loading={isLoading}
+              setHighlighted={setHighlighted}
             />
-          </SearchContainer>
-          <SearchPanel
-            data={coordinates}
+          </SearchAndResultsContainer>
+
+          <Map
+            coordinates={coordinates}
+            getMapBounds={getMapBounds}
+            mapBounds={mapBounds}
+            initialCenter={center}
+            highlighted={highlighted}
             loading={isLoading}
-            setHighlighted={setHighlighted}
+            geocoderSearchElm={geocoderSearchElm}
+            key={'main-map'}
           />
-        </SearchAndResultsContainer>
 
-        <Map
-          coordinates={coordinates}
-          getMapBounds={getMapBounds}
-          mapBounds={mapBounds}
-          initialCenter={center}
-          highlighted={highlighted}
-          loading={isLoading}
-          geocoderSearchElm={geocoderSearchElm}
-          key={'main-map'}
-        />
+        </ContentContainer>
 
-      </ContentContainer>
-
-      <FooterContainer>
-        <NavLinks>
-          <NavLink
-            href={'https://www.supportyourlocal.online/presse'}
-          >
-            Press
-          </NavLink>
-          <NavLink
-            href={'https://www.supportyourlocal.online/kontakt'}
-          >
-            Contact
-          </NavLink>
-          <NavLink
-            href={'https://www.supportyourlocal.online/datenschutz'}
-          >
-            Data Privacy
-          </NavLink>
-          <NavLink
-            href={'https://www.supportyourlocal.online/impressum'}
-          >
-            Imprint
-          </NavLink>
-        </NavLinks>
-      </FooterContainer>
-    </Root>
+        <FooterContainer>
+          <NavLinks>
+            <NavLink
+              href={'https://www.supportyourlocal.online/presse'}
+            >
+              {getFluentString('navigation-links-press')}
+            </NavLink>
+            <NavLink
+              href={'https://www.supportyourlocal.online/kontakt'}
+            >
+              {getFluentString('navigation-links-contact')}
+            </NavLink>
+            <NavLink
+              href={'https://www.supportyourlocal.online/datenschutz'}
+            >
+              {getFluentString('navigation-links-data-privacy')}
+            </NavLink>
+            <NavLink
+              href={'https://www.supportyourlocal.online/impressum'}
+            >
+              {getFluentString('navigation-links-imprint')}
+            </NavLink>
+          </NavLinks>
+        </FooterContainer>
+      </Root>
+    </>
   );
 
 };

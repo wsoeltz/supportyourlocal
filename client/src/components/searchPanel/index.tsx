@@ -2,9 +2,13 @@ import {
   faMapMarkerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { GetString } from 'fluent-react/compat';
 import {darken} from 'polished';
-import React from 'react';
+import React, {useContext} from 'react';
 import styled from 'styled-components/macro';
+import {
+  AppLocalizationAndBundleContext,
+} from '../../contextProviders/getFluentLocalizationContext';
 import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor } from '../../styling/styleUtils';
@@ -95,6 +99,9 @@ interface Props {
 const SearchPanel = (props: Props) => {
   const {data, loading, setHighlighted} = props;
 
+  const {localization} = useContext(AppLocalizationAndBundleContext);
+  const getFluentString: GetString = (...args) => localization.getString(...args);
+
   const prevData = usePrevious(data);
 
   const dataToUse = loading === true ? prevData : data;
@@ -103,7 +110,7 @@ const SearchPanel = (props: Props) => {
   if (!dataToUse || !dataToUse.length) {
     content = (
       <NoResults>
-        <em>Sorry, we couldn't find any results in this location</em>
+        <em>{getFluentString('ui-text-no-results-for-location')}</em>
       </NoResults>
     );
   } else {
@@ -119,7 +126,7 @@ const SearchPanel = (props: Props) => {
               target='_blank'
               rel='noopener noreferrer'
             >
-              View Website
+              {getFluentString('ui-text-view-website')}
             </LinkButton>
           )
         : null;
@@ -131,7 +138,7 @@ const SearchPanel = (props: Props) => {
             target='_blank'
             rel='noopener noreferrer'
           >
-            Visit Voucher Shop
+            {getFluentString('ui-text-visit-voucher-shop')}
           </LinkButton>
         );
       } else {
