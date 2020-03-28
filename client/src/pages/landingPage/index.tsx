@@ -9,6 +9,7 @@ import gql from 'graphql-tag';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import {lighten} from 'polished';
+import queryString from 'query-string';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
@@ -317,12 +318,26 @@ const LandingPage = () => {
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
-  const initialMapBounds = !userLocation ? {
-    minLong: 12.4, maxLong: 14.4, minLat: 51.4874445, maxLat: 53.4874445,
-  } : {
-    minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
-    minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
-  };
+  const { lat, lng, query } = queryString.parse(window.location.search);
+  const initialSearch = query ? query as string : '';
+  window.history.replaceState({}, document.title, '/');
+
+  let initialMapBounds: MapBounds;
+  if (lat && lng) {
+    const queryLat = parseFloat(lat as string);
+    const queryLng = parseFloat(lng as string);
+    initialMapBounds = {
+      minLong: queryLng - 1, maxLong: queryLng + 1,
+      minLat: queryLat - 1, maxLat: queryLat + 1,
+    };
+  } else if (userLocation) {
+    initialMapBounds = {
+      minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
+      minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
+    };
+  } else {
+    initialMapBounds = { minLong: 12.4, maxLong: 14.4, minLat: 51.4874445, maxLat: 53.4874445 };
+  }
 
   const initialCenter: [number, number] = [
     (initialMapBounds.maxLong + initialMapBounds.minLong) / 2,
@@ -336,14 +351,14 @@ const LandingPage = () => {
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (userLocation) {
+    if (userLocation && !lat && !lng) {
       setMapBounds({
         minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
         minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
       });
       setCenter([userLocation.longitude, userLocation.latitude]);
     }
-  }, [userLocation]);
+  }, [userLocation, lat, lng]);
 
   const geocoderSearchElmRef = useRef<HTMLDivElement | null>(null);
 
@@ -450,7 +465,7 @@ const LandingPage = () => {
             <SearchContainer>
               <StandardSearch
                 placeholder={getFluentString('ui-text-search-for-a-shop-placegholer')}
-                initialQuery={''}
+                initialQuery={initialSearch}
                 setSearchQuery={setSearchQuery}
                 focusOnMount={false}
               />
