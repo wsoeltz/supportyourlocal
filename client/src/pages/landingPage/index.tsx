@@ -13,8 +13,9 @@ import React, {useContext, useEffect, useRef, useState} from 'react';
 import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
+import LoaderSmall from '../../components/general/LoaderSmall';
 import Map, {MapBounds} from '../../components/map';
-import SearchPanel from '../../components/searchPanel';
+import SearchPanel, {mobileWidth} from '../../components/searchPanel';
 import StandardSearch from '../../components/searchPanel/StandardSearch';
 import {
   AppLocalizationAndBundleContext,
@@ -32,6 +33,10 @@ const Root = styled(Content)`
   height: 100%;
   overflow: hidden;
   grid-template-rows: 70px 1fr 70px;
+
+  @media (max-width: ${mobileWidth}px) {
+    grid-template-rows: 40px 1fr 30px;
+  }
 `;
 
 const GeoCoderSearchContainer = styled.div`
@@ -39,6 +44,15 @@ const GeoCoderSearchContainer = styled.div`
   padding: 1rem 1rem;
   display: grid;
   grid-template-columns: 1fr 2.5rem;
+  position: relative;
+`;
+
+const GeoCoderSearchLoader = styled.div`
+  position: absolute;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const spinAnimation = keyframes`
@@ -108,6 +122,7 @@ const GeoCoderSearch = styled.div`
     background-color: #fff;
     border: solid 1px #dedede;
     box-shadow: 0px 0px 3px -1px #b5b5b5;
+    width: 100%;
 
     ul.suggestions {
       margin: 0;
@@ -191,6 +206,11 @@ const ContentContainer = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
+
+  @media (max-width: ${mobileWidth}px) {
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
 `;
 
 const SearchAndResultsContainer = styled.div`
@@ -204,6 +224,17 @@ const SearchAndResultsContainer = styled.div`
   grid-template-rows: auto auto 1fr;
   background-color: ${primaryBackgroundColor};
   box-shadow: 1px 0px 2px 0px rgba(0, 0, 0, 0.2);
+
+  @media (max-width: 800px) {
+    width: 290px;
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
 `;
 
 const SearchContainer = styled.div`
@@ -395,9 +426,21 @@ const LandingPage = () => {
 
         <ContentContainer>
 
+          <Map
+            coordinates={coordinates}
+            getMapBounds={getMapBounds}
+            mapBounds={mapBounds}
+            initialCenter={center}
+            highlighted={highlighted}
+            loading={isLoading}
+            geocoderSearchElm={geocoderSearchElm}
+            key={'main-map'}
+          />
+
           <SearchAndResultsContainer>
             <GeoCoderSearchContainer>
               <GeoCoderSearch ref={geocoderSearchElmRef}>
+                <GeoCoderSearchLoader><LoaderSmall /></GeoCoderSearchLoader>
                 <LocationIcon icon={faMapMarkerAlt} />
               </GeoCoderSearch>
               <UseMyLocation onClick={getUsersLocation}>
@@ -418,17 +461,6 @@ const LandingPage = () => {
               setHighlighted={setHighlighted}
             />
           </SearchAndResultsContainer>
-
-          <Map
-            coordinates={coordinates}
-            getMapBounds={getMapBounds}
-            mapBounds={mapBounds}
-            initialCenter={center}
-            highlighted={highlighted}
-            loading={isLoading}
-            geocoderSearchElm={geocoderSearchElm}
-            key={'main-map'}
-          />
 
         </ContentContainer>
 

@@ -13,6 +13,8 @@ import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor } from '../../styling/styleUtils';
 
+export const mobileWidth = 600;
+
 const Root = styled.div`
   height: 100%;
   overflow: hidden;
@@ -20,6 +22,10 @@ const Root = styled.div`
   grid-template-rows: 1fr;
   position: relative;
   z-index: 10;
+
+  @media (max-width: ${mobileWidth}px) {
+    min-height: 120px;
+  }
 `;
 
 const ScrollContainer = styled.div`
@@ -27,6 +33,24 @@ const ScrollContainer = styled.div`
   height: 100%;
   overflow: auto;
   box-sizing: border-box;
+
+  @media (max-width: ${mobileWidth}px) {
+    display: flex;
+    width: 100%;
+  }
+
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 8px;
+    height: 12px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .3);
+  }
+  ::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, .1);
+  }
 `;
 
 const Card = styled.div`
@@ -34,6 +58,16 @@ const Card = styled.div`
   padding: 0.8rem 0 1.3rem;
   border-bottom: solid 1px ${lightBorderColor};
   position: relative;
+
+  @media (max-width: ${mobileWidth}px) {
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    padding: 0 0.8rem;
+    display: flex;
+    flex-direction: column;
+    border-bottom: none;
+    border-right: solid 1px ${lightBorderColor};
+  }
 `;
 
 const TitleContainer = styled.div`
@@ -88,6 +122,11 @@ const ShowOnMap = styled.button`
   background-color: transparent;
   color: #215890;
   font-size: 1rem;
+
+  @media (max-width: ${mobileWidth}px) {
+    top: 0;
+    right: 0;
+  }
 `;
 
 interface Props {
