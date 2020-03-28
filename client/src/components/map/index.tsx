@@ -27,6 +27,7 @@ import usePrevious from '../../hooks/usePrevious';
 import {
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
+import {darken} from 'polished';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
 
@@ -37,6 +38,18 @@ const Mapbox = ReactMapboxGl({
 });
 
 const primaryColor = '#215890';
+
+const Root = styled.div`
+  width: 100%;
+  height: 100%;
+  
+  .mapboxgl-popup-tip {
+    border-top-color: rgba(255, 255, 255, 0.85);
+  }
+  .mapboxgl-popup-content {
+    background-color: rgba(255, 255, 255, 0.85);
+  }
+`;
 
 const StyledPopup = styled.div`
   text-align: center;
@@ -65,11 +78,12 @@ const Header = styled.div`
 `;
 
 const Logo = styled.img`
-  max-width: 180px;
-  max-height: 180px;
+  max-width: 140px;
+  max-height: 80px;
 `;
 
 const PopupTitle = styled.h2`
+  font-size: 1.1rem;
 `;
 
 const PopupLinks = styled.div`
@@ -81,15 +95,21 @@ const PopupLinks = styled.div`
 `;
 
 const LinkButton = styled.a`
-  padding: 0.3rem 0.5rem;
-  border: solid 1px ${primaryColor};
-  color: ${primaryColor};
+  padding: 0.3rem 0.4rem;
+  background-color: #b2b2b2;
+  color: #fff;
   text-decoration: none;
-  text-transform: uppercase;
+  text-transform: capitalize;
+  text-align: center;
+  font-size: 0.75rem;
+  border-radius: 5px;
 
   &:hover {
-    background-color: ${primaryColor};
-    color: #fff;
+    background-color: ${darken(0.1, '#b2b2b2')};
+  }
+
+  &:not(:last-child) {
+    margin-right: 0.6rem;
   }
 `;
 
@@ -277,7 +297,6 @@ const Map = (props: Props) => {
     popup = (
       <Popup
         coordinates={[popupInfo.longitude, popupInfo.latitude]}
-        style={{opacity: 0.85}}
       >
         <StyledPopup>
           <PopupContent>
@@ -312,6 +331,7 @@ const Map = (props: Props) => {
   };
 
   return (
+    <Root>
       <Mapbox
         // eslint-disable-next-line
         style={'mapbox://styles/supportyourlocal/ck89mllhy08br1iqiu6g54xha'}
@@ -346,6 +366,7 @@ const Map = (props: Props) => {
         {popup}
         <MapContext.Consumer children={mapRenderProps} />
       </Mapbox>
+    </Root>
   );
 
 };
