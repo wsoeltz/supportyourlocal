@@ -1,7 +1,9 @@
 import { useQuery } from '@apollo/react-hooks';
 import {
+  faBars,
   faMapMarkerAlt,
   faStreetView,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GetString } from 'fluent-react/compat';
@@ -209,7 +211,7 @@ const HeadingContainer = styled.div`
   background-color: ${primaryColor};
   box-shadow: 0px 3px 6px -2px rgba(0,0,0,0.2);
   position: relative;
-  z-index: 10;
+  z-index: 100;
 `;
 
 const HeadingLogo = styled.h1`
@@ -283,6 +285,8 @@ const NavLinks = styled.nav`
   font-family: ${primaryFont};
 `;
 
+const mobileMenuScreenWidth = 730; // in px
+
 const NavLink = styled.a`
   margin-right: 1.5rem;
   font-weight: 400;
@@ -298,8 +302,54 @@ const NavLink = styled.a`
   }
 `;
 
-const NavLinkCurrent = styled(NavLink)`
+const HeaderNavLink = styled(NavLink)`
+  @media (max-width: ${mobileMenuScreenWidth}px) {
+    margin: 0.75rem 0;
+  }
+`;
+
+const NavLinkCurrent = styled(HeaderNavLink)`
   color: ${secondaryColor};
+`;
+
+const MobileMenuButton = styled.button`
+  margin-left: auto;
+  padding: 0 1rem;
+  background-color: ${primaryColor};
+  color: #fff;
+  font-size: 14px;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  outline: none;
+
+  &:hover {
+    color: ${secondaryColor};
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    font-size: 10px;
+  }
+`;
+
+const MobileMenuIcon = styled(FontAwesomeIcon)`
+  font-size: 28px;
+
+  @media (max-width: ${mobileWidth}px) {
+    font-size: 20px;
+  }
+`;
+
+const MobileMenu = styled.nav`
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  flex-direction: column;
+  transform: translateY(100%);
+  background-color: ${primaryColor};
+  padding: 1rem;
 `;
 
 const FooterContainer = styled.div`
@@ -349,7 +399,7 @@ interface WinodwQuery {
 }
 
 const LandingPage = () => {
-  const { userLocation, setUserLocation } = useContext(AppContext);
+  const { userLocation, setUserLocation, windowWidth } = useContext(AppContext);
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
@@ -387,6 +437,7 @@ const LandingPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(undefined);
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (userLocation && (!windowQuery || (!windowQuery.lat && !windowQuery.lng))) {
@@ -487,6 +538,68 @@ const LandingPage = () => {
   const defaultMetaTitle = getFluentString('meta-data-base-title');
   const defaultMetaDescription = getFluentString('meta-data-base-description');
 
+  let navigation: React.ReactElement<any>;
+  if (windowWidth > mobileMenuScreenWidth) {
+    navigation = (
+      <NavLinks>
+        <HeaderNavLink
+          href={'https://www.supportyourlocal.online/'}
+        >
+          {getFluentString('navigation-links-mission')}
+        </HeaderNavLink>
+        <NavLinkCurrent
+          href={'/'}
+        >
+          {getFluentString('navigation-links-favorite-places')}
+        </NavLinkCurrent>
+        <HeaderNavLink
+          href={'https://www.supportyourlocal.online/shop-eintragen'}
+        >
+          {getFluentString('navigation-links-for-shop-owners')}
+        </HeaderNavLink>
+        <HeaderNavLink
+          href={'https://www.supportyourlocal.online/ueber'}
+        >
+          {getFluentString('navigation-links-about')}
+        </HeaderNavLink>
+      </NavLinks>
+    );
+  } else {
+    const display = isMobileMenuOpen ? 'flex' : 'none';
+    const menuFluentId =  isMobileMenuOpen ? 'ui-text-menu-close' : 'ui-text-open-menu';
+    const icon = isMobileMenuOpen ? faTimes : faBars;
+    navigation = (
+      <>
+        <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {getFluentString(menuFluentId)}
+          <MobileMenuIcon icon={icon} />
+        </MobileMenuButton>
+        <MobileMenu style={{display}}>
+          <HeaderNavLink
+            href={'https://www.supportyourlocal.online/'}
+          >
+            {getFluentString('navigation-links-mission')}
+          </HeaderNavLink>
+          <NavLinkCurrent
+            href={'/'}
+          >
+            {getFluentString('navigation-links-favorite-places')}
+          </NavLinkCurrent>
+          <HeaderNavLink
+            href={'https://www.supportyourlocal.online/shop-eintragen'}
+          >
+            {getFluentString('navigation-links-for-shop-owners')}
+          </HeaderNavLink>
+          <HeaderNavLink
+            href={'https://www.supportyourlocal.online/ueber'}
+          >
+            {getFluentString('navigation-links-about')}
+          </HeaderNavLink>
+        </MobileMenu>
+      </>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -504,28 +617,7 @@ const LandingPage = () => {
               {getFluentString('base-title-no-hash')}
             </HeadingLogo>
           </div>
-          <NavLinks>
-            <NavLink
-              href={'https://www.supportyourlocal.online/'}
-            >
-              {getFluentString('navigation-links-mission')}
-            </NavLink>
-            <NavLinkCurrent
-              href={'/'}
-            >
-              {getFluentString('navigation-links-favorite-places')}
-            </NavLinkCurrent>
-            <NavLink
-              href={'https://www.supportyourlocal.online/shop-eintragen'}
-            >
-              {getFluentString('navigation-links-for-shop-owners')}
-            </NavLink>
-            <NavLink
-              href={'https://www.supportyourlocal.online/ueber'}
-            >
-              {getFluentString('navigation-links-about')}
-            </NavLink>
-          </NavLinks>
+          {navigation}
         </HeadingContainer>
 
         <ContentContainer>

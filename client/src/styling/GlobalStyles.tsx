@@ -1,9 +1,11 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
+  faBars,
   faMapMarker,
   faMapMarkerAlt,
   faSearch,
   faStreetView,
+  faTimes,
 } from '@fortawesome/free-solid-svg-icons';
 import { createGlobalStyle } from 'styled-components/macro';
 import {
@@ -14,7 +16,7 @@ import {
 } from './styleUtils';
 
 // Add all font awesome icons here
-library.add(faSearch, faMapMarkerAlt, faStreetView, faMapMarker);
+library.add(faSearch, faMapMarkerAlt, faStreetView, faMapMarker, faBars, faTimes);
 
 const GlobalStyles = createGlobalStyle`
   @media(max-width: 600px) {
