@@ -12,6 +12,7 @@ navigation-links-imprint = Imprint
 
 ui-text-search-for-a-shop-placegholer = Search for a shop in this area
 ui-text-no-results-for-location = Sorry, we couldn't find any results in this location
+ui-text-out-out-range = Please zoom in closer for results
 ui-text-there-was-an-error = There was an error retreiving the data for this location. Please try refreshing the page.
 ui-text-view-website = View Website
 ui-text-visit-voucher-shop = Visit Voucher Shop

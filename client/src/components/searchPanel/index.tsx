@@ -14,6 +14,7 @@ import {
 import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor } from '../../styling/styleUtils';
+import {getDistanceFromLatLonInMiles} from '../../Utils';
 import {Coordinate, MapBounds} from '../map';
 
 export const mobileWidth = 600;
@@ -136,6 +137,13 @@ const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   margin: 2rem 0;
+
+  @media (max-width: ${mobileWidth}px) {
+    padding: 1rem;
+    margin: 0;
+    flex-direction: column-reverse;
+    align-items: center;
+  }
 `;
 
 const PageButtonBase = styled.button`
@@ -150,6 +158,12 @@ const PageButtonBase = styled.button`
 
   &:hover {
     background-color: ${darken(0.4, '#b2b2b2')};
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    white-space: nowrap;
+    width: 100%;
+    height: 2rem;
   }
 `;
 
@@ -259,9 +273,17 @@ const SearchPanel = (props: Props) => {
       </NoResults>
     );
   } else if (!dataToUse || !dataToUse.businesses || dataToUse.businesses.length === 0) {
+    const range = getDistanceFromLatLonInMiles({
+      lat1: mapBounds.maxLat,
+      lon1: mapBounds.minLong,
+      lat2: mapBounds.minLat,
+      lon2: mapBounds.maxLong,
+    });
+    const noResultsFluentId = range > 500
+      ? 'ui-text-out-out-range' : 'ui-text-no-results-for-location';
     content = (
       <NoResults>
-        <em>{getFluentString('ui-text-no-results-for-location')}</em>
+        <em>{getFluentString(noResultsFluentId)}</em>
       </NoResults>
     );
   } else {
