@@ -314,6 +314,12 @@ interface SuccessResponse {
   }>;
 }
 
+interface WinodwQuery {
+  lat: string | undefined;
+  lng: string | undefined;
+  query: string | undefined;
+}
+
 const LandingPage = () => {
   const { userLocation, setUserLocation } = useContext(AppContext);
 
@@ -321,11 +327,12 @@ const LandingPage = () => {
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
   const { lat, lng, query } = queryString.parse(window.location.search);
-  const initialSearch = query ? query as string : '';
-  window.history.replaceState({}, document.title, '/');
+  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, query } as WinodwQuery);
+  const initialSearch = windowQuery && windowQuery.query ? query as string : '';
+  useEffect(() => window.history.replaceState({}, document.title, '/'), []);
 
   let initialMapBounds: MapBounds;
-  if (lat && lng) {
+  if (windowQuery && windowQuery.lat && windowQuery.lng) {
     const queryLat = parseFloat(lat as string);
     const queryLng = parseFloat(lng as string);
     initialMapBounds = {
@@ -354,7 +361,7 @@ const LandingPage = () => {
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (userLocation && !lat && !lng) {
+    if (userLocation && (!windowQuery || (!windowQuery.lat && !windowQuery.lng))) {
       const newMapBounds = {
         minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
         minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
@@ -363,7 +370,7 @@ const LandingPage = () => {
       setPreciseMapBounds({...newMapBounds});
       setCenter([userLocation.longitude, userLocation.latitude]);
     }
-  }, [userLocation, lat, lng]);
+  }, [userLocation, windowQuery]);
 
   const geocoderSearchElmRef = useRef<HTMLDivElement | null>(null);
 
@@ -439,6 +446,7 @@ const LandingPage = () => {
     const onSuccess = ({coords: {latitude, longitude}}: Position) => {
       setCenter([longitude + (Math.random() * 0.00001), latitude + (Math.random() * 0.00001)]);
       setUserLocation({latitude, longitude});
+      setWindowQuery(undefined);
     };
     const onError = () => {
       console.error('Unable to retrieve your location');
