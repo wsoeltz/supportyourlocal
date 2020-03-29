@@ -1,21 +1,21 @@
-meta-data-base-title = #supportyourlocal
-meta-data-base-description = Support your local businesses during the COVID-19 pandemic
+meta-data-base-title = #supportyourlocal - die große Karte mit allen Lieblingsorten
+meta-data-base-description = Unterstütze während der Corona-Quarantäne Geschäfte in Deiner Gegend. Hier findest Du viele teilnehmenden Orte in Deiner Stadt #supportyourlocal
 
 base-title-no-hash = supportyourlocal
 
-navigation-links-mission = Mission
-navigation-links-for-shop-owners = For Shop Owners
-navigation-links-about = About
+navigation-links-mission = Unsere Mission
+navigation-links-for-shop-owners = Für Unternehmen
+navigation-links-about = Über uns
 
-navigation-links-press = Press
-navigation-links-contact = Contact
-navigation-links-data-privacy = Data Privacy
-navigation-links-imprint = Imprint
+navigation-links-press = Presse
+navigation-links-contact = Kontakt
+navigation-links-data-privacy = Datenschutz
+navigation-links-imprint = Impressum
 
-ui-text-search-for-a-shop-placegholer = Search for a shop in this area
-ui-text-no-results-for-location = Sorry, we couldn't find any results in this location
+ui-text-search-for-a-shop-placegholer = Ergebnisse filtern...
+ui-text-no-results-for-location = Leider konnten wir hier (noch) keinen Lieblingsort finden
 ui-text-out-out-range = Please zoom in closer for results
 ui-text-there-was-an-error = There was an error retreiving the data for this location. Please try refreshing the page.
-ui-text-view-website = View Website
-ui-text-visit-voucher-shop = Visit Voucher Shop
-ui-text-find-a-location = Find a location
+ui-text-view-website = Zur Webseite
+ui-text-visit-voucher-shop = Zum Gutschein-Shop
+ui-text-find-a-location = Deine Stadt
