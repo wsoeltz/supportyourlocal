@@ -200,7 +200,7 @@ const Map = (props: Props) => {
     <Root>
       <Mapbox
         // eslint-disable-next-line
-        style={'mapbox://styles/supportyourlocal/ck89mllhy08br1iqiu6g54xha'}
+        style={'mapbox://styles/supportyourlocal/ck8d2yehn0exr1iofqyvenrad'}
         containerStyle={{
           height: '100%',
           width: '100%',
