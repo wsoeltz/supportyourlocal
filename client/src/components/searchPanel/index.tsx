@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
 import {darken} from 'polished';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/macro';
 import {
   AppLocalizationAndBundleContext,
@@ -132,6 +132,35 @@ const ShowOnMap = styled.button`
   }
 `;
 
+const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin: 2rem 0;
+`;
+
+const PageButtonBase = styled.button`
+  padding: 0.3rem 0.4rem;
+  background-color: ${darken(0.3, '#b2b2b2')};
+  color: #fff;
+  text-decoration: none;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.75rem;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: ${darken(0.4, '#b2b2b2')};
+  }
+`;
+
+const NextButton = styled(PageButtonBase)`
+  margin-left: auto;
+`;
+
+const PreviousButton = styled(PageButtonBase)`
+  margin-right: auto;
+`;
+
 const SEARCH_BUSINESSES = gql`
   query ListBusinesses(
     $minLat: Float!,
@@ -194,12 +223,28 @@ const SearchPanel = (props: Props) => {
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
-  const [pageNumber] = useState<number>(1);
+  const [pageNumber, setPageNumber] = useState<number>(1);
   const nPerPage = 25;
+
+  const incPage = () => setPageNumber(pageNumber + 1);
+  const decPage = () => setPageNumber(pageNumber > 0 ? pageNumber - 1 : 0);
 
   const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
     variables: {...mapBounds, searchQuery, nPerPage, pageNumber},
   });
+
+  useEffect(() => {
+    setPageNumber(0);
+  }, [mapBounds, searchQuery, setPageNumber]);
+
+  const resultsContainerElm = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = resultsContainerElm.current;
+    if (node) {
+      node.scrollTop = 0;
+    }
+  }, [resultsContainerElm, pageNumber]);
 
   const prevData = usePrevious(data);
 
@@ -270,7 +315,23 @@ const SearchPanel = (props: Props) => {
         </Card>
       );
     });
-    content = <ScrollContainer>{cards}</ScrollContainer>;
+
+    const nextButton = dataToUse.businesses.length === nPerPage ? (
+      <NextButton onClick={incPage}>Next ›</NextButton>
+    ) : null;
+    const prevButton = pageNumber > 1 ? (
+      <PreviousButton onClick={decPage}>‹ Previous</PreviousButton>
+    ) : null;
+
+    content = (
+      <ScrollContainer ref={resultsContainerElm}>
+        {cards}
+        <PaginationContainer>
+          {prevButton}
+          {nextButton}
+        </PaginationContainer>
+      </ScrollContainer>
+    );
   }
 
   return (
