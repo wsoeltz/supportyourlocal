@@ -294,7 +294,6 @@ const NavLink = styled.a`
   border-bottom: solid 1px transparent;
   font-size: 0.9rem;
   text-decoration: none;
-  font-size: 16px;
 
   &:hover {
     color: ${secondaryColor};
@@ -303,8 +302,18 @@ const NavLink = styled.a`
 `;
 
 const HeaderNavLink = styled(NavLink)`
+  font-size: 16px;
+
   @media (max-width: ${mobileMenuScreenWidth}px) {
     margin: 0.75rem 0;
+  }
+`;
+
+const FooterNavLink = styled(NavLink)`
+  font-size: 15px;
+
+  @media (max-width: ${mobileWidth}px) {
+    font-size: 14px;
   }
 `;
 
@@ -662,26 +671,26 @@ const LandingPage = () => {
 
         <FooterContainer>
           <NavLinks>
-            <NavLink
+            <FooterNavLink
               href={'https://www.supportyourlocal.online/presse'}
             >
               {getFluentString('navigation-links-press')}
-            </NavLink>
-            <NavLink
+            </FooterNavLink>
+            <FooterNavLink
               href={'https://www.supportyourlocal.online/kontakt'}
             >
               {getFluentString('navigation-links-contact')}
-            </NavLink>
-            <NavLink
+            </FooterNavLink>
+            <FooterNavLink
               href={'https://www.supportyourlocal.online/datenschutz'}
             >
               {getFluentString('navigation-links-data-privacy')}
-            </NavLink>
-            <NavLink
+            </FooterNavLink>
+            <FooterNavLink
               href={'https://www.supportyourlocal.online/impressum'}
             >
               {getFluentString('navigation-links-imprint')}
-            </NavLink>
+            </FooterNavLink>
           </NavLinks>
         </FooterContainer>
       </Root>
