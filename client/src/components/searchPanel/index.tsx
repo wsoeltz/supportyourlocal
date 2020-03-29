@@ -1,10 +1,12 @@
+import { useQuery } from '@apollo/react-hooks';
 import {
   faMapMarkerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GetString } from 'fluent-react/compat';
+import gql from 'graphql-tag';
 import {darken} from 'polished';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import styled from 'styled-components/macro';
 import {
   AppLocalizationAndBundleContext,
@@ -12,6 +14,7 @@ import {
 import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { lightBorderColor } from '../../styling/styleUtils';
+import {Coordinate, MapBounds} from '../map';
 
 export const mobileWidth = 600;
 
@@ -129,31 +132,95 @@ const ShowOnMap = styled.button`
   }
 `;
 
+const SEARCH_BUSINESSES = gql`
+  query ListBusinesses(
+    $minLat: Float!,
+    $maxLat: Float!,
+    $minLong: Float!,
+    $maxLong: Float!,
+    $searchQuery: String!,
+    $nPerPage: Int!,
+    $pageNumber: Int!,
+  ) {
+    businesses: searchBusinesses(
+      minLat: $minLat,
+      maxLat: $maxLat,
+      minLong: $minLong,
+      maxLong: $maxLong,
+      searchQuery: $searchQuery,
+      nPerPage: $nPerPage,
+      pageNumber: $pageNumber,
+    ) {
+      id
+      name
+      address
+      website
+      secondaryUrl
+      industry
+      latitude
+      longitude
+    }
+  }
+`;
+
+interface SearchVariables extends MapBounds {
+  searchQuery: string;
+  pageNumber: number;
+  nPerPage: number;
+}
+
+interface SuccessResponse {
+  businesses: Array<{
+    id: Business['id'];
+    name: Business['name'];
+    address: Business['address'];
+    website: Business['website'];
+    secondaryUrl: Business['secondaryUrl'];
+    industry: Business['industry'];
+    latitude: Business['latitude'];
+    longitude: Business['longitude'];
+  }>;
+}
+
 interface Props {
-  loading: boolean;
-  data: Business[];
-  setHighlighted: (value: [Business]) => void;
+  setHighlighted: (value: [Coordinate]) => void;
+  mapBounds: MapBounds;
+  searchQuery: string;
 }
 
 const SearchPanel = (props: Props) => {
-  const {data, loading, setHighlighted} = props;
+  const {setHighlighted, mapBounds, searchQuery} = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
+
+  const [pageNumber] = useState<number>(1);
+  const nPerPage = 25;
+
+  const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
+    variables: {...mapBounds, searchQuery, nPerPage, pageNumber},
+  });
 
   const prevData = usePrevious(data);
 
   const dataToUse = loading === true ? prevData : data;
 
   let content: React.ReactElement<any> | null;
-  if (!dataToUse || !dataToUse.length) {
+  if (error) {
+    console.error(error);
+    content = (
+      <NoResults>
+        <em>{getFluentString('ui-text-there-was-an-error')}</em>
+      </NoResults>
+    );
+  } else if (!dataToUse || !dataToUse.businesses || dataToUse.businesses.length === 0) {
     content = (
       <NoResults>
         <em>{getFluentString('ui-text-no-results-for-location')}</em>
       </NoResults>
     );
   } else {
-    const cards = dataToUse.map(d => {
+    const cards = dataToUse.businesses.map(d => {
       const {
         name, address, website,
         secondaryUrl, industry,

@@ -15,7 +15,7 @@ import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
 import LoaderSmall from '../../components/general/LoaderSmall';
-import Map, {MapBounds} from '../../components/map';
+import Map, {Coordinate, MapBounds} from '../../components/map';
 import SearchPanel, {mobileWidth} from '../../components/searchPanel';
 import StandardSearch from '../../components/searchPanel/StandardSearch';
 import {
@@ -24,6 +24,7 @@ import {
 import {
   Business,
 } from '../../graphQLTypes';
+import usePrevious from '../../hooks/usePrevious';
 import { Content } from '../../styling/Grid';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 
@@ -287,18 +288,6 @@ const SEARCH_BUSINESSES = gql`
       searchQuery: $searchQuery,
     ) {
       id
-      externalId
-      source
-      name
-      address
-      city
-      country
-      email
-      website
-      secondaryUrl
-      logo
-      images
-      industry
       latitude
       longitude
     }
@@ -310,7 +299,11 @@ interface SearchVariables extends MapBounds {
 }
 
 interface SuccessResponse {
-  businesses: Business[];
+  businesses: Array<{
+    id: Business['id'];
+    latitude: Business['latitude'];
+    longitude: Business['longitude'];
+  }>;
 }
 
 const LandingPage = () => {
@@ -347,16 +340,19 @@ const LandingPage = () => {
 
   const [center, setCenter] = useState<[number, number]>(initialCenter);
   const [mapBounds, setMapBounds] = useState<MapBounds>({...initialMapBounds});
+  const [preciseMapBounds, setPreciseMapBounds] = useState<MapBounds>({...initialMapBounds});
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [highlighted, setHighlighted] = useState<[Business] | undefined>(undefined);
+  const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(undefined);
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     if (userLocation && !lat && !lng) {
-      setMapBounds({
+      const newMapBounds = {
         minLong: userLocation.longitude - 1, maxLong: userLocation.longitude + 1,
         minLat: userLocation.latitude - 1, maxLat: userLocation.latitude + 1,
-      });
+      };
+      setMapBounds({...newMapBounds});
+      setPreciseMapBounds({...newMapBounds});
       setCenter([userLocation.longitude, userLocation.latitude]);
     }
   }, [userLocation, lat, lng]);
@@ -382,6 +378,13 @@ const LandingPage = () => {
       lat2: newMapBounds.minLat,
       lon2: newMapBounds.maxLong,
     });
+    const boundsExtension = 0.5;
+    const extendedMapBounds = {
+      maxLat: newMapBounds.maxLat + boundsExtension,
+      maxLong: newMapBounds.maxLong + boundsExtension,
+      minLat: newMapBounds.minLat - boundsExtension,
+      minLong: newMapBounds.minLong - boundsExtension,
+    };
     if (
         !(isEqual(newMapBounds, mapBounds)) && (
           (newMapBounds.maxLat > mapBounds.maxLat) ||
@@ -391,8 +394,16 @@ const LandingPage = () => {
           (oldRange > 500 && newRange <= 500)
         )
       ) {
-      setMapBounds({...newMapBounds});
+      const extendedRange = getDistanceFromLatLonInMiles({
+        lat1: extendedMapBounds.maxLat,
+        lon1: extendedMapBounds.minLong,
+        lat2: extendedMapBounds.minLat,
+        lon2: extendedMapBounds.maxLong,
+      });
+      const boundsToUse = extendedRange > 400 ? newMapBounds : extendedMapBounds;
+      setMapBounds({...boundsToUse});
     }
+    setPreciseMapBounds({...newMapBounds});
   };
 
   const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
@@ -400,16 +411,18 @@ const LandingPage = () => {
   });
 
   const isLoading = loading || userLocation === undefined;
+  const prevData = usePrevious(data);
+  const dataToUse = loading === true ? prevData : data;
 
-  let coordinates: Business[];
-  if (isLoading) {
+  let coordinates: Coordinate[];
+  if (dataToUse !== undefined) {
+    const { businesses } = dataToUse;
+    coordinates = sortBy(businesses, ['name']);
+  } else if (isLoading) {
     coordinates = [];
   } else if (error !== undefined) {
     console.error(error);
     coordinates = [];
-  } else if (data !== undefined) {
-    const { businesses } = data;
-    coordinates = sortBy(businesses, ['name']);
   } else {
     coordinates = [];
   }
@@ -493,9 +506,9 @@ const LandingPage = () => {
               />
             </SearchContainer>
             <SearchPanel
-              data={coordinates}
-              loading={isLoading}
               setHighlighted={setHighlighted}
+              mapBounds={preciseMapBounds}
+              searchQuery={searchQuery}
             />
           </SearchAndResultsContainer>
 

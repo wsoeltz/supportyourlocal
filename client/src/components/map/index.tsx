@@ -2,7 +2,6 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { GetString } from 'fluent-react/compat';
 import debounce from 'lodash/debounce';
 import mapboxgl from 'mapbox-gl';
-import {darken} from 'polished';
 import React, {
   useContext,
   useEffect,
@@ -12,7 +11,6 @@ import ReactMapboxGl, {
   Feature,
   Layer,
   MapContext,
-  Popup,
   RotationControl,
   ZoomControl,
 } from 'react-mapbox-gl';
@@ -20,14 +18,8 @@ import styled from 'styled-components';
 import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';
-import {
-  Business,
-  Source,
-} from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
-import {
-  semiBoldFontBoldWeight,
-} from '../../styling/styleUtils';
+import StyledPopup from './StyledPopup';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
 
@@ -51,72 +43,6 @@ const Root = styled.div`
   }
 `;
 
-const StyledPopup = styled.div`
-  text-align: center;
-`;
-
-const ClosePopup = styled.div`
-  position: absolute;
-  top: -0.1rem;
-  right: 0.1rem;
-  font-size: 0.9rem;
-  font-weight: ${semiBoldFontBoldWeight};
-  color: #999;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const PopupContent = styled.div`
-  display: grid;
-  grid-template-rows: auto auto auto;
-`;
-
-const Header = styled.div`
-  grid-row: 1;
-`;
-
-const Logo = styled.img`
-  max-width: 140px;
-  max-height: 80px;
-`;
-
-const PopupTitle = styled.h2`
-  font-size: 1.1rem;
-`;
-
-const PopupLinks = styled.div`
-  display: grid;
-  grid-auto-columns: 1fr;
-  grid-auto-flow: column;
-  grid-column-gap: 1rem;
-  margin-bottom: 1rem;
-`;
-
-const LinkButton = styled.a`
-  padding: 0.3rem 0.4rem;
-  background-color: #b2b2b2;
-  color: #fff;
-  text-decoration: none;
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 0.75rem;
-  border-radius: 5px;
-
-  &:hover {
-    background-color: ${darken(0.1, '#b2b2b2')};
-  }
-
-  &:not(:last-child) {
-    margin-right: 0.6rem;
-  }
-`;
-
-const PopupAddress = styled.div`
-  grid-row: 3;
-`;
-
 export interface MapBounds {
   minLat: number;
   maxLat: number;
@@ -124,9 +50,15 @@ export interface MapBounds {
   maxLong: number;
 }
 
+export interface Coordinate {
+  id: string;
+  latitude: number;
+  longitude: number;
+}
+
 interface Props {
-  coordinates: Business[];
-  highlighted?: Business[];
+  coordinates: Coordinate[];
+  highlighted?: Coordinate[];
   mapBounds: MapBounds;
   getMapBounds: (mapBounds: MapBounds) => void;
   initialCenter: [number, number] | undefined;
@@ -197,7 +129,7 @@ const Map = (props: Props) => {
 
   const coordinatesToUse = loading === true && prevData ? prevData : coordinates;
 
-  const [popupInfo, setPopupInfo] = useState<Business | null>(null);
+  const [popupInfo, setPopupInfo] = useState<Coordinate | null>(null);
   const [center, setCenter] = useState<[number, number] | undefined>(initialCenter);
 
   useEffect(() => {
@@ -245,78 +177,12 @@ const Map = (props: Props) => {
   if (!popupInfo) {
     popup = <></>;
   } else {
-    const {
-      name, source, address, website,
-      secondaryUrl, logo,
-    } = popupInfo;
-    let logoImg: React.ReactElement<any> | null;
-    if (logo) {
-      if (logo.match(/\.(jpeg|jpg|gif|png)$/) !== null) {
-        logoImg = <Logo src={logo} alt={name} />;
-      } else {
-        logoImg = null;
-      }
-    } else {
-      logoImg = null;
-    }
-    const websiteLink = website
-      ? (
-          <LinkButton
-            href={website}
-            target='_blank'
-            rel='noopener noreferrer'
-          >
-            {getFluentString('ui-text-view-website')}
-          </LinkButton>
-        )
-      : null;
-    let secondaryLink: React.ReactElement<any> | null;
-    if (secondaryUrl) {
-      secondaryLink = source === Source.firstvoucher
-        ? (
-            <LinkButton
-              href={secondaryUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {getFluentString('ui-text-visit-voucher-shop')}
-            </LinkButton>
-          )
-        : (
-            <LinkButton
-              href={secondaryUrl}
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              {secondaryUrl}
-            </LinkButton>
-          );
-    } else {
-      secondaryLink = null;
-    }
     popup = (
-      <Popup
-        coordinates={[popupInfo.longitude, popupInfo.latitude]}
-      >
-        <StyledPopup>
-          <PopupContent>
-            <Header>
-              {logoImg}
-              <PopupTitle>{name}</PopupTitle>
-            </Header>
-            <PopupLinks>
-              {secondaryLink}
-              {websiteLink}
-            </PopupLinks>
-            <PopupAddress>
-              {address}
-            </PopupAddress>
-          </PopupContent>
-          <ClosePopup onClick={() => setPopupInfo(null)}>×</ClosePopup>
-        </StyledPopup>
-      </Popup>
+      <StyledPopup {...popupInfo}
+        getFluentString={getFluentString}
+        closePopup={() => setPopupInfo(null)}
+      />
     );
-
   }
 
   const mapRenderProps = (mapEl: any) => {
