@@ -1,25 +1,20 @@
 {
-  "short_name": "Country Dashboards",
-  "name": "Country Dashboards by the Growth Lab at Harvard Kennedy School",
+  "short_name": "#supportyourlocal",
+  "name": "Support your local businesses during the COVID-19 pandemic",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "favicon.png",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "logo144.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "144x144"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#001240",
+  "background_color": "#001240"
 }
