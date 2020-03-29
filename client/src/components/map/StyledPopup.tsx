@@ -138,6 +138,7 @@ const StyledPopup = (props: Props) => {
             href={website}
             target='_blank'
             rel='noopener noreferrer'
+            data-clickout='website'
           >
             {getFluentString('ui-text-view-website')}
           </LinkButton>
@@ -150,6 +151,7 @@ const StyledPopup = (props: Props) => {
           href={secondaryUrl}
           target='_blank'
           rel='noopener noreferrer'
+          data-clickout='vouchershop'
         >
           {getFluentString('ui-text-visit-voucher-shop')}
         </LinkButton>
