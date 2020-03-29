@@ -296,13 +296,18 @@ const SearchPanel = (props: Props) => {
       } else {
         secondaryLink = null;
       }
+      const industryElm = industry && industry.length ? (
+        <>
+          {industry}
+          <br />
+        </>
+      ) : null;
       return (
         <Card key={d.id}>
           <TitleContainer>
             <Title>{name}</Title>
             <Info>
-              {industry}
-              <br />
+              {industryElm}
               {address}
             </Info>
           </TitleContainer>

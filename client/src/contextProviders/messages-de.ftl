@@ -20,3 +20,6 @@ ui-text-there-was-an-error = Leider gab es einen Fehler. Bitte aktualisiere die 
 ui-text-view-website = Zur Webseite
 ui-text-visit-voucher-shop = Zum Gutschein-Shop
 ui-text-find-a-location = Deine Stadt
+
+ui-text-open-menu = Menu
+ui-text-menu-close = Close

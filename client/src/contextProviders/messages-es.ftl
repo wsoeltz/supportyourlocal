@@ -20,3 +20,6 @@ ui-text-there-was-an-error = There was an error retreiving the data for this loc
 ui-text-view-website = View Website
 ui-text-visit-voucher-shop = Visit Voucher Shop
 ui-text-find-a-location = Find a location
+
+ui-text-open-menu = Menu
+ui-text-menu-close = Close
