@@ -288,7 +288,22 @@ const FirstVoucherDataDownload = () => {
   if (missingData && missingData.length) {
     const appendedMissingData = missingData.map((d: FirstVoucherResponseDatum) => {
       if (d && d.address && d.id) {
-        return {id: d.id, address: d.address};
+        return {
+          source: Source.firstvoucher,
+          externalId: d.id,
+          name: d.title,
+          address: d.address,
+          latitude: '',
+          longitude: '',
+          city: d.city,
+          country: 'Germany',
+          email: d.email,
+          website: d.website,
+          secondaryUrl: d.url,
+          images: d.background,
+          industry: d.industry,
+          description: '',
+        };
       } else {
         return {id: '', address: ''};
       }

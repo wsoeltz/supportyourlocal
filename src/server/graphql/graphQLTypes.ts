@@ -9,14 +9,15 @@ export interface Business {
   source: Source | null;
   name: string;
   address: string;
-  city: string;
+  city: string | null;
   country: string;
-  email: string;
+  email: string | null;
   website: string | null;
   secondaryUrl: string | null;
   logo: string | null;
   images: string[] | null;
-  industry: string;
+  industry: string | null;
+  description: string | null;
   latitude: number;
   longitude: number;
 }
