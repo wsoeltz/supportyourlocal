@@ -25,6 +25,7 @@ import {
   Business,
 } from '../../graphQLTypes';
 import { Content } from '../../styling/Grid';
+import {getDistanceFromLatLonInMiles} from '../../Utils';
 
 const primaryBackgroundColor = '#f3f3f3';
 const primaryColor = '#215890';
@@ -369,10 +370,31 @@ const LandingPage = () => {
   }, [geocoderSearchElmRef, setGeocoderSearchElm]);
 
   const getMapBounds = (newMapBounds: MapBounds) => {
-    if (!(isEqual(newMapBounds, mapBounds))) {
+    const oldRange = getDistanceFromLatLonInMiles({
+      lat1: mapBounds.maxLat,
+      lon1: mapBounds.minLong,
+      lat2: mapBounds.minLat,
+      lon2: mapBounds.maxLong,
+    });
+    const newRange = getDistanceFromLatLonInMiles({
+      lat1: newMapBounds.maxLat,
+      lon1: newMapBounds.minLong,
+      lat2: newMapBounds.minLat,
+      lon2: newMapBounds.maxLong,
+    });
+    if (
+        !(isEqual(newMapBounds, mapBounds)) && (
+          (newMapBounds.maxLat > mapBounds.maxLat) ||
+          (newMapBounds.maxLong > mapBounds.maxLong) ||
+          (newMapBounds.minLat < mapBounds.minLat) ||
+          (newMapBounds.minLong < mapBounds.minLong) ||
+          (oldRange > 500 && newRange <= 500)
+        )
+      ) {
       setMapBounds({...newMapBounds});
     }
   };
+
   const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
     variables: {...mapBounds, searchQuery},
   });
