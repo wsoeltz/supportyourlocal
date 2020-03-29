@@ -99,6 +99,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUti
           mapboxgl,
           placeholder: getFluentString('ui-text-find-a-location'),
           language: navigator.language,
+          countries: 'de',
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
         setHasGeoCoder(true);
