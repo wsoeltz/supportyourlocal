@@ -26,11 +26,16 @@ import {
 } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { Content } from '../../styling/Grid';
-import { primaryColor, secondaryColor } from '../../styling/styleUtils';
+import {
+  borderRadius,
+  primaryColor,
+  primaryFont,
+  secondaryColor,
+  secondaryFont,
+} from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 
 const primaryBackgroundColor = '#f3f3f3';
-const borderRadius = 8; // in px
 
 const Root = styled(Content)`
   display: grid;
@@ -76,17 +81,29 @@ const GeoCoderSearch = styled.div`
   background-color: #fff;
   position: relative;
   z-index: 100;
+  border-top-left-radius: ${borderRadius}px;
+  border-bottom-left-radius: ${borderRadius}px;
 
   input.mapboxgl-ctrl-geocoder--input {
     padding: 8px 8px 8px 2.5rem;
-    border: none;
+    border: solid 1px transparent;
     box-sizing: border-box;
     width: 100%;
     font-size: 1.2rem;
     font-weight: 300;
+    outline: none;
+    border-top-left-radius: ${borderRadius}px;
+    border-bottom-left-radius: ${borderRadius}px;
+    color: #001240;
+    font-family: ${secondaryFont};
+
+    &:focus {
+      border-color: ${secondaryColor};
+    }
 
     &::placeholder {
-      color: #999;
+      font-family: ${secondaryFont};
+      color: #b1bccb;
     }
   }
 
@@ -122,15 +139,18 @@ const GeoCoderSearch = styled.div`
 
   .suggestions-wrapper {
     position: absolute;
-    background-color: #fff;
-    border: solid 1px #dedede;
-    box-shadow: 0px 0px 3px -1px #b5b5b5;
     width: 100%;
 
     ul.suggestions {
+      width: 100%;
+      background-color: #fff;
+      border: solid 1px #dedede;
+      box-shadow: 0px 0px 3px -1px #b5b5b5;
       margin: 0;
       padding: 0;
       list-style: none;
+      border-radius: ${borderRadius}px;
+      overflow: hidden;
 
       li {
         &:hover, &.active {
@@ -165,6 +185,8 @@ const UseMyLocation = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+  border-top-right-radius: ${borderRadius}px;
+  border-bottom-right-radius: ${borderRadius}px;
 
   &:hover {
     background-color: ${darken(0.1, secondaryColor)}
@@ -177,7 +199,7 @@ const LocationIcon = styled(FontAwesomeIcon)`
   bottom: 0;
   margin: auto 0.5rem;
   font-size: 1.5rem;
-  color: #999;
+  color: #b1bccb;
   cursor: pointer;
   z-index: 10;
 `;
@@ -199,7 +221,7 @@ const HeadingLogo = styled.h1`
   font-size: 1.3rem;
   line-height: 1.5rem;
   text-align: center;
-  font-family: Montserrat, sans-serif;
+  font-family: ${primaryFont};
   position: absolute;
   z-index: 50;
   left: 1rem;
@@ -230,8 +252,8 @@ const SearchAndResultsContainer = styled.div`
   z-index: 100;
   display: grid;
   grid-template-rows: auto auto 1fr;
-  background-color: ${primaryBackgroundColor};
-  box-shadow: 1px 0px 2px 0px rgba(0, 0, 0, 0.2);
+  background-color: #fff;
+  box-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.2);
   border-top-right-radius: ${borderRadius}px;
   border-bottom-right-radius: ${borderRadius}px;
 
@@ -249,7 +271,7 @@ const SearchAndResultsContainer = styled.div`
 
 const SearchContainer = styled.div`
   padding: 1rem 1rem;
-  background-color: ${primaryBackgroundColor};
+  background-color: #fff;
 `;
 
 const NavLinks = styled.nav`
@@ -258,20 +280,26 @@ const NavLinks = styled.nav`
   justify-content: flex-end;
   align-items: center;
   height: 100%;
+  font-family: ${primaryFont};
 `;
 
 const NavLink = styled.a`
   margin-right: 1.5rem;
-  font-weight: 700;
+  font-weight: 400;
   color: #fff;
   border-bottom: solid 1px transparent;
   font-size: 0.9rem;
   text-decoration: none;
+  font-size: 16px;
 
   &:hover {
     color: ${secondaryColor};
     border-bottom-color: ${secondaryColor};
   }
+`;
+
+const NavLinkCurrent = styled(NavLink)`
+  color: ${secondaryColor};
 `;
 
 const FooterContainer = styled.div`
@@ -482,6 +510,11 @@ const LandingPage = () => {
             >
               {getFluentString('navigation-links-mission')}
             </NavLink>
+            <NavLinkCurrent
+              href={'/'}
+            >
+              {getFluentString('navigation-links-favorite-places')}
+            </NavLinkCurrent>
             <NavLink
               href={'https://www.supportyourlocal.online/shop-eintragen'}
             >

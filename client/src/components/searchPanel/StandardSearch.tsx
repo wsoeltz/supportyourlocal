@@ -4,7 +4,10 @@ import React, { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components/macro';
 import { AppContext } from '../../App';
 import {
+  borderRadius,
   lightBorderColor,
+  secondaryColor,
+  secondaryFont,
 } from '../../styling/styleUtils';
 
 const SearchContainer = styled.label`
@@ -21,7 +24,7 @@ const SearchIcon = styled(FontAwesomeIcon)`
   bottom: 0;
   margin: auto ${magnifyingGlassSpacing}rem;
   font-size: ${magnifyingGlassSize}rem;
-  color: #999;
+  color: #b1bccb;
   cursor: pointer;
 `;
 
@@ -30,12 +33,21 @@ const SearchBar = styled.input`
   padding: 8px 8px 8px ${magnifyingGlassSize + (magnifyingGlassSpacing * 2)}rem;
   box-sizing: border-box;
   border: solid 1px ${lightBorderColor};
-  box-shadow: 0px 0px 3px -1px #b5b5b5;
   font-size: 1.2rem;
   font-weight: 300;
+  border-radius: ${borderRadius}px;
+  box-shadow: none;
+  outline: none;
+  font-family: ${secondaryFont};
+  color: #001240;
 
   &::placeholder {
-    color: #999;
+    font-family: ${secondaryFont};
+    color: #b1bccb;
+  }
+
+  &:focus {
+    border-color: ${secondaryColor};
   }
 `;
 

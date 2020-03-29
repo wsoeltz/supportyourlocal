@@ -5,7 +5,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
-import {darken} from 'polished';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -13,7 +12,7 @@ import {
 } from '../../contextProviders/getFluentLocalizationContext';
 import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
-import { lightBorderColor, primaryColor } from '../../styling/styleUtils';
+import { lightBorderColor, LinkButton, primaryColor, secondaryColor } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 import {Coordinate, MapBounds} from '../map';
 
@@ -84,33 +83,12 @@ const Title = styled.h4`
   font-size: 1rem;
   margin-top: 0;
   margin-bottom: 0.5rem;
+  color: #001240;
 `;
 
 const Info = styled.p`
   font-size: 0.9rem;
-  color: #666;
-`;
-
-const LinkContainer = styled.div`
-`;
-
-const LinkButton = styled.a`
-  padding: 0.3rem 0.4rem;
-  background-color: #b2b2b2;
-  color: #fff;
-  text-decoration: none;
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 0.75rem;
-  border-radius: 5px;
-
-  &:hover {
-    background-color: ${darken(0.1, '#b2b2b2')};
-  }
-
-  &:not(:last-child) {
-    margin-right: 0.6rem;
-  }
+  color: #435369;
 `;
 
 const NoResults = styled.p`
@@ -148,8 +126,9 @@ const PaginationContainer = styled.div`
 
 const PageButtonBase = styled.button`
   padding: 0.3rem 0.4rem;
-  background-color: ${darken(0.3, '#b2b2b2')};
-  color: #fff;
+  background-color: ${secondaryColor};
+  border: solid 2px ${secondaryColor};
+  color: ${primaryColor};
   text-decoration: none;
   text-transform: uppercase;
   text-align: center;
@@ -157,7 +136,7 @@ const PageButtonBase = styled.button`
   border-radius: 5px;
 
   &:hover {
-    background-color: ${darken(0.4, '#b2b2b2')};
+    background-color: transparent;
   }
 
   @media (max-width: ${mobileWidth}px) {
@@ -327,10 +306,10 @@ const SearchPanel = (props: Props) => {
               {address}
             </Info>
           </TitleContainer>
-          <LinkContainer>
+          <div>
             {secondaryLink}
             {websiteLink}
-          </LinkContainer>
+          </div>
           <ShowOnMap onClick={() => setHighlighted([d])}>
             <FontAwesomeIcon icon={faMapMarkerAlt} />
           </ShowOnMap>

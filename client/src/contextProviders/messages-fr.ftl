@@ -4,6 +4,7 @@ meta-data-base-description = Support your local businesses during the COVID-19 p
 base-title-no-hash = supportyourlocal
 
 navigation-links-mission = Mission
+navigation-links-favorite-places = Favorite Places
 navigation-links-for-shop-owners = For Shop Owners
 navigation-links-about = About
 

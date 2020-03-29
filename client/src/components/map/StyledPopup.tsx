@@ -1,7 +1,6 @@
 import { useQuery } from '@apollo/react-hooks';
 import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
-import {darken} from 'polished';
 import React from 'react';
 import {
   Popup,
@@ -11,6 +10,7 @@ import {
   Business,
 } from '../../graphQLTypes';
 import {
+  LinkButton,
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
 import LoaderSmall from '../general/LoaderSmall';
@@ -56,25 +56,6 @@ const PopupLinks = styled.div`
   grid-auto-flow: column;
   grid-column-gap: 1rem;
   margin-bottom: 1rem;
-`;
-
-const LinkButton = styled.a`
-  padding: 0.3rem 0.4rem;
-  background-color: #b2b2b2;
-  color: #fff;
-  text-decoration: none;
-  text-transform: capitalize;
-  text-align: center;
-  font-size: 0.75rem;
-  border-radius: 5px;
-
-  &:hover {
-    background-color: ${darken(0.1, '#b2b2b2')};
-  }
-
-  &:not(:last-child) {
-    margin-right: 0.6rem;
-  }
 `;
 
 const PopupAddress = styled.div`

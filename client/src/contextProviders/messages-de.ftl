@@ -4,6 +4,7 @@ meta-data-base-description = Unterstütze während der Corona-Quarantäne Gesch�
 base-title-no-hash = supportyourlocal
 
 navigation-links-mission = Unsere Mission
+navigation-links-favorite-places = Favorite Places
 navigation-links-for-shop-owners = Für Unternehmen
 navigation-links-about = Über uns
 
@@ -14,8 +15,8 @@ navigation-links-imprint = Impressum
 
 ui-text-search-for-a-shop-placegholer = Ergebnisse filtern...
 ui-text-no-results-for-location = Leider konnten wir hier (noch) keinen Lieblingsort finden
-ui-text-out-out-range = Please zoom in closer for results
-ui-text-there-was-an-error = There was an error retreiving the data for this location. Please try refreshing the page.
+ui-text-out-out-range = Bitte zoome herein, um Ergebnisse anzuzeigen
+ui-text-there-was-an-error = Leider gab es einen Fehler. Bitte aktualisiere die Seite.
 ui-text-view-website = Zur Webseite
 ui-text-visit-voucher-shop = Zum Gutschein-Shop
 ui-text-find-a-location = Deine Stadt

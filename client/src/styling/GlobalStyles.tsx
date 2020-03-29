@@ -9,7 +9,7 @@ import { createGlobalStyle } from 'styled-components/macro';
 import {
   baseColor,
   lightBaseColor,
-  primaryFont,
+  secondaryFont,
   semiBoldFontBoldWeight,
 } from './styleUtils';
 
@@ -29,7 +29,7 @@ const GlobalStyles = createGlobalStyle`
   }
 
   body {
-    font-family: ${primaryFont};
+    font-family: ${secondaryFont};
     color: ${baseColor};
     margin: 0;
     padding: 0;
