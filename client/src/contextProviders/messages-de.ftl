@@ -21,5 +21,5 @@ ui-text-view-website = Zur Webseite
 ui-text-visit-voucher-shop = Zum Gutschein-Shop
 ui-text-find-a-location = Deine Stadt
 
-ui-text-open-menu = Menu
-ui-text-menu-close = Close
+ui-text-open-menu = Menü
+ui-text-menu-close = Schließen
