@@ -28,6 +28,7 @@ import { Root } from './styling/Grid';
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
 const GeneralGeoCoderDataDownload = lazy(() => import('./pages/tools/GeneralGeoCoderDataDownload'));
+const FixFirstVoucherData = lazy(() => import('./pages/tools/FixFirstVoucherData'));
 const PageNotFound = lazy(() => import('./pages/pageNotFound'));
 
 const client = new ApolloClient();
@@ -111,6 +112,9 @@ function App() {
                     />
                     <Route exact path={Routes.GeneralGeoCoderDataDownload}
                       render={(props: any) => <GeneralGeoCoderDataDownload {...props} />}
+                    />
+                    <Route exact path={Routes.FixFirstVoucherData}
+                      render={(props: any) => <FixFirstVoucherData {...props} />}
                     />
                     {/* If none of the above routes are found show the 404 page */}
                     <Route component={PageNotFound} />

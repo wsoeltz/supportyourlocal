@@ -8,8 +8,8 @@ import {
 } from '../../graphQLTypes';
 import { Content } from '../../styling/Grid';
 
-const ADD_BUSINESS = gql`
-  mutation AddBusiness(
+const UPDATE_EXTERNAL_BUSINESS = gql`
+  mutation UpdateExternalBusiness(
     $externalId: String,
     $source: String,
     $name: String!,
@@ -26,7 +26,7 @@ const ADD_BUSINESS = gql`
     $latitude: Float!,
     $longitude: Float!,
   ) {
-    business: addBusiness(
+    business: updateExternalIdBusiness(
       externalId: $externalId,
       source: $source,
       name: $name,
@@ -75,7 +75,7 @@ interface Variables {
   secondaryUrl: string | null;
   logo: string | null;
   images: string[] | null;
-  industry: string;
+  industry: string | null;
   latitude: number;
   longitude: number;
 }
@@ -97,14 +97,14 @@ interface BusinessRaw {
   longitude: string;
 }
 
-const GeneralGeoCoderDataDownload = () => {
+const FixFirstVoucherData = () => {
   const [data, setData] = useState<BusinessRaw[] | undefined>(undefined);
 
-  const [addBusiness] = useMutation<{business: Business}, Variables>(ADD_BUSINESS);
+  const [updateExternalBusiness] = useMutation<{business: Business}, Variables>(UPDATE_EXTERNAL_BUSINESS);
 
   useEffect(() => {
 
-    const csvData = raw('./data/_20200328/datadump.csv');
+    const csvData = raw('./data/_20200329/fixed-first-voucher-data.csv');
     csv().fromString(csvData).then((res: BusinessRaw[]) => setData(res));
 
   }, []);
@@ -128,7 +128,7 @@ const GeneralGeoCoderDataDownload = () => {
           latitude,
           longitude,
         } = datum;
-        addBusiness({ variables: {
+        updateExternalBusiness({ variables: {
           externalId: externalId.length ? externalId : null,
           source: source.length ? externalId : null,
           name,
@@ -138,9 +138,9 @@ const GeneralGeoCoderDataDownload = () => {
           email: email.length ? email : null,
           website: website.length ? website : null,
           secondaryUrl: secondaryUrl.length ? secondaryUrl : null,
-          logo,
+          logo: logo.length ? logo : null,
           images: images.length ? [images] : null,
-          industry,
+          industry: industry.length ? industry : null,
           latitude: parseFloat(latitude),
           longitude: parseFloat(longitude),
         }});
@@ -154,10 +154,10 @@ const GeneralGeoCoderDataDownload = () => {
 
   return (
     <Content>
-      GeneralGeoCoderDataDownload
+      FixFirstVoucherData
       <button onClick={addAllData}>Add Data</button>
     </Content>
   );
 };
 
-export default GeneralGeoCoderDataDownload;
+export default FixFirstVoucherData;

@@ -76,6 +76,39 @@ const businessMutations: any = {
       }
     },
   },
+  updateExternalIdBusiness: {
+    type: BusinessType,
+    args: {
+      externalId: { type: GraphQLString },
+      source: { type: GraphQLString },
+      name: { type: GraphQLNonNull(GraphQLString) },
+      address: { type: GraphQLNonNull(GraphQLString) },
+      city: { type: GraphQLString },
+      country: { type: GraphQLNonNull(GraphQLString) },
+      email: { type: GraphQLString },
+      website: { type: GraphQLString },
+      secondaryUrl: { type: GraphQLString },
+      logo: { type: GraphQLString },
+      images: { type: new GraphQLList(GraphQLString) },
+      industry: { type: GraphQLString },
+      description: { type: GraphQLString },
+      latitude: { type: GraphQLNonNull(GraphQLFloat) },
+      longitude: { type: GraphQLNonNull(GraphQLFloat) },
+    },
+    async resolve(_unused: any, input: IBusiness) {
+      try {
+        const {externalId, source} = input;
+        const newBusiness = await Business.findOneAndUpdate({
+            externalId, source,
+          },
+          { ...input },
+          {new: true});
+        return newBusiness;
+      } catch (err) {
+        return err;
+      }
+    },
+  },
 
 };
 
