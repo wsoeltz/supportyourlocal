@@ -1,12 +1,57 @@
-import { useMutation } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
+import axios from 'axios';
 import csv from 'csvtojson';
 import gql from 'graphql-tag';
-import raw from 'raw.macro';
 import React, {useEffect, useState} from 'react';
+import styled from 'styled-components/macro';
 import {
   Business,
 } from '../../graphQLTypes';
 import { Content } from '../../styling/Grid';
+import { primaryColor } from '../../styling/styleUtils';
+import {getDistanceFromLatLonInMiles} from '../../Utils';
+
+const Root = styled.div`
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Input = styled.input`
+  width: 600px;
+  font-size: 1rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+`;
+
+const SubmitButton = styled.button`
+  padding: 0.7rem 1rem;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: ${primaryColor};
+`;
+
+const GET_ALL_BUSINESSES = gql`
+  query ListBusinesses {
+    businesses {
+      id
+      name
+      latitude
+      longitude
+    }
+  }
+`;
+
+interface SuccessResponse {
+  businesses: Array<{
+    id: Business['id'];
+    name: Business['name'];
+    latitude: Business['latitude'];
+    longitude: Business['longitude'];
+  }>;
+}
 
 const ADD_BUSINESS = gql`
   mutation AddBusiness(
@@ -69,13 +114,13 @@ interface Variables {
   name: string;
   address: string;
   city: string | null;
-  country: string;
+  country: string | null;
   email: string | null;
   website: string | null;
   secondaryUrl: string | null;
   logo: string | null;
   images: string[] | null;
-  industry: string;
+  industry: string | null;
   latitude: number;
   longitude: number;
 }
@@ -98,64 +143,124 @@ interface BusinessRaw {
 }
 
 const GeneralGeoCoderDataDownload = () => {
-  const [data, setData] = useState<BusinessRaw[] | undefined>(undefined);
+
+  const [url, setUrl] = useState<string>('');
+  const [key, setKey] = useState<string>('');
+  const [data, setData] = useState<Variables[] | undefined>(undefined);
+
+  const {data: graphqlData} = useQuery<SuccessResponse>(GET_ALL_BUSINESSES);
+
+  let isDataClean: boolean;
+  if (key === process.env.REACT_APP_SECRET_DATA_UPLOAD_KEY && data) {
+    isDataClean = true;
+  } else {
+    isDataClean = false;
+  }
 
   const [addBusiness] = useMutation<{business: Business}, Variables>(ADD_BUSINESS);
 
   useEffect(() => {
+    const cleanData = (rawData: BusinessRaw[]) => {
+      if (graphqlData && graphqlData.businesses) {
+        const cleanedData: Variables[] = [];
+        rawData.forEach(datum => {
+          const {
+            externalId,
+            source,
+            name,
+            address,
+            city,
+            country,
+            email,
+            website,
+            secondaryUrl,
+            logo,
+            images,
+            industry,
+            latitude,
+            longitude,
+          } = datum;
+          const exists = graphqlData.businesses.find(gqlDatum => {
+            const distance = getDistanceFromLatLonInMiles({
+              lat1: parseFloat(latitude),
+              lon1: parseFloat(longitude),
+              lat2: gqlDatum.latitude,
+              lon2: gqlDatum.longitude,
+            });
+            if (gqlDatum.name === name && distance < 0.05) {
+              return true;
+            } else {
+              return false;
+            }
+          });
+          if (!exists) {
+            cleanedData.push({
+              externalId: externalId.length ? externalId : null,
+              source: source.length ? externalId : null,
+              name,
+              address,
+              city: city.length ? city : null,
+              country,
+              email: email.length ? email : null,
+              website: website.length ? website : null,
+              secondaryUrl: secondaryUrl.length ? secondaryUrl : null,
+              logo,
+              images: images.length ? [images] : null,
+              industry,
+              latitude: parseFloat(latitude),
+              longitude: parseFloat(longitude),
+            });
+          }
+        });
+        setData(cleanedData);
+      }
+    };
+    const getCSVData = async () => {
+      try {
+        if (url && url.length) {
+          const res = await axios.get(url);
+          if (res && res.data) {
+            csv().fromString(res.data).then((json: BusinessRaw[]) => cleanData(json));
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getCSVData();
 
-    const csvData = raw('./data/_20200328/datadump.csv');
-    csv().fromString(csvData).then((res: BusinessRaw[]) => setData(res));
-
-  }, []);
+  }, [url, graphqlData]);
 
   const addAllData = () => {
     if (data) {
       data.forEach(datum => {
-        const {
-          externalId,
-          source,
-          name,
-          address,
-          city,
-          country,
-          email,
-          website,
-          secondaryUrl,
-          logo,
-          images,
-          industry,
-          latitude,
-          longitude,
-        } = datum;
-        addBusiness({ variables: {
-          externalId: externalId.length ? externalId : null,
-          source: source.length ? externalId : null,
-          name,
-          address,
-          city: city.length ? city : null,
-          country,
-          email: email.length ? email : null,
-          website: website.length ? website : null,
-          secondaryUrl: secondaryUrl.length ? secondaryUrl : null,
-          logo,
-          images: images.length ? [images] : null,
-          industry,
-          latitude: parseFloat(latitude),
-          longitude: parseFloat(longitude),
-        }});
+        addBusiness({ variables: {...datum}});
       });
     }
   };
 
-  if (process.env.NODE_ENV === 'production') {
-    return null;
-  }
+  const submitButton = isDataClean ? (
+    <SubmitButton onClick={addAllData}>Add Data</SubmitButton>
+  ) : null;
 
   return (
     <Content>
-      GeneralGeoCoderDataDownload
-      <button onClick={addAllData}>Add Data</button>
+      <Root>
+        <h1>Data Upload</h1>
+        <Input
+          type='text'
+          placeholder='URL'
+          value={url}
+          onChange={e => setUrl(e.target.value)}
+        />
+        <Input
+          type='password'
+          placeholder='Key'
+          value={key}
+          onChange={e => setKey(e.target.value)}
+        />
+        {submitButton}
+      </Root>
     </Content>
   );
 };
