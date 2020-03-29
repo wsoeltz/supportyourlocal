@@ -19,6 +19,7 @@ import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';
 import usePrevious from '../../hooks/usePrevious';
+import { primaryColor } from '../../styling/styleUtils';
 import StyledPopup from './StyledPopup';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
@@ -28,8 +29,6 @@ const Mapbox = ReactMapboxGl({
   maxZoom: 16,
   scrollZoom: true,
 });
-
-const primaryColor = '#215890';
 
 const Root = styled.div`
   width: 100%;

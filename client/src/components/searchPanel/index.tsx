@@ -13,7 +13,7 @@ import {
 } from '../../contextProviders/getFluentLocalizationContext';
 import { Business } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
-import { lightBorderColor } from '../../styling/styleUtils';
+import { lightBorderColor, primaryColor } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 import {Coordinate, MapBounds} from '../map';
 
@@ -124,7 +124,7 @@ const ShowOnMap = styled.button`
   top: 0.5rem;
   right: -0.4rem;
   background-color: transparent;
-  color: #215890;
+  color: ${primaryColor};
   font-size: 1rem;
 
   @media (max-width: ${mobileWidth}px) {

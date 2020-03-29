@@ -8,7 +8,7 @@ import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {lighten} from 'polished';
+import {darken} from 'polished';
 import queryString from 'query-string';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import Helmet from 'react-helmet';
@@ -26,16 +26,17 @@ import {
 } from '../../graphQLTypes';
 import usePrevious from '../../hooks/usePrevious';
 import { Content } from '../../styling/Grid';
+import { primaryColor, secondaryColor } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 
 const primaryBackgroundColor = '#f3f3f3';
-const primaryColor = '#215890';
+const borderRadius = 8; // in px
 
 const Root = styled(Content)`
   display: grid;
   height: 100%;
   overflow: hidden;
-  grid-template-rows: 70px 1fr 70px;
+  grid-template-rows: 80px 1fr 70px;
 
   @media (max-width: ${mobileWidth}px) {
     grid-template-rows: 40px 1fr 30px;
@@ -43,11 +44,12 @@ const Root = styled(Content)`
 `;
 
 const GeoCoderSearchContainer = styled.div`
-  background-color: #e2e2e2;
+  background-color: ${primaryColor};
   padding: 1rem 1rem;
   display: grid;
   grid-template-columns: 1fr 2.5rem;
   position: relative;
+  border-top-right-radius: ${borderRadius}px;
 `;
 
 const GeoCoderSearchLoader = styled.div`
@@ -70,8 +72,6 @@ const spinAnimation = keyframes`
 const GeoCoderSearch = styled.div`
   position: relative;
   min-height: 2.5625rem;
-  border: solid 1px #dcdcdc;
-  box-shadow: 0px 0px 3px -1px #b5b5b5;
   box-sizing: border-box;
   background-color: #fff;
   position: relative;
@@ -157,8 +157,8 @@ const GeoCoderSearch = styled.div`
 `;
 
 const UseMyLocation = styled.button`
-  background-color: ${primaryColor};
-  color: #fff;
+  background-color: ${secondaryColor};
+  color: ${primaryColor};
   border: none;
   box-shadow: none;
   font-size: 1.4rem;
@@ -167,7 +167,7 @@ const UseMyLocation = styled.button`
   align-items: center;
 
   &:hover {
-    background-color: ${lighten(0.1, primaryColor)}
+    background-color: ${darken(0.1, secondaryColor)}
   }
 `;
 
@@ -184,7 +184,7 @@ const LocationIcon = styled(FontAwesomeIcon)`
 
 const HeadingContainer = styled.div`
   display: flex;
-  background-color: ${primaryBackgroundColor};
+  background-color: ${primaryColor};
   box-shadow: 0px 3px 6px -2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 10;
@@ -193,9 +193,9 @@ const HeadingContainer = styled.div`
 const HeadingLogo = styled.h1`
   display: inline-block;
   padding: 0.7rem 1rem;
-  background-color: #000;
+  background-color: ${secondaryColor};
   transform: rotate(-3deg);
-  color: #fff;
+  color: ${primaryColor};
   font-size: 1.3rem;
   line-height: 1.5rem;
   text-align: center;
@@ -203,6 +203,11 @@ const HeadingLogo = styled.h1`
   position: absolute;
   z-index: 50;
   left: 1rem;
+`;
+
+const Hash = styled.span`
+  color: #fff;
+  margin-right: 0.3rem;
 `;
 
 const ContentContainer = styled.div`
@@ -227,6 +232,8 @@ const SearchAndResultsContainer = styled.div`
   grid-template-rows: auto auto 1fr;
   background-color: ${primaryBackgroundColor};
   box-shadow: 1px 0px 2px 0px rgba(0, 0, 0, 0.2);
+  border-top-right-radius: ${borderRadius}px;
+  border-bottom-right-radius: ${borderRadius}px;
 
   @media (max-width: 800px) {
     width: 290px;
@@ -256,18 +263,19 @@ const NavLinks = styled.nav`
 const NavLink = styled.a`
   margin-right: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: #fff;
   border-bottom: solid 1px transparent;
   font-size: 0.9rem;
   text-decoration: none;
 
   &:hover {
-    border-bottom-color: #333;
+    color: ${secondaryColor};
+    border-bottom-color: ${secondaryColor};
   }
 `;
 
 const FooterContainer = styled.div`
-  background-color: ${primaryBackgroundColor};
+  background-color: ${primaryColor};
   box-shadow: 0px -2px 6px -2px rgba(0,0,0,0.2);
   position: relative;
 `;
@@ -454,7 +462,12 @@ const LandingPage = () => {
       </Helmet>
       <Root>
         <HeadingContainer>
-          <div><HeadingLogo>{defaultMetaTitle}</HeadingLogo></div>
+          <div>
+            <HeadingLogo>
+              <Hash>#</Hash>
+              {getFluentString('base-title-no-hash')}
+            </HeadingLogo>
+          </div>
           <NavLinks>
             <NavLink
               href={'https://www.supportyourlocal.online/'}

@@ -1,6 +1,8 @@
 meta-data-base-title = #supportyourlocal
 meta-data-base-description = Support your local businesses during the COVID-19 pandemic
 
+base-title-no-hash = supportyourlocal
+
 navigation-links-mission = Mission
 navigation-links-for-shop-owners = For Shop Owners
 navigation-links-about = About
