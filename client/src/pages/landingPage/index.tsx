@@ -176,6 +176,12 @@ const GeoCoderSearch = styled.div`
         }
       }
     }
+
+    .mapbox-gl-geocoder--no-results {
+      padding: 0.4rem;
+      width: 100%;
+      background-color: #fff;
+    }
   }
 `;
 

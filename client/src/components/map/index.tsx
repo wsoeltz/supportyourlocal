@@ -100,6 +100,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUti
           placeholder: getFluentString('ui-text-find-a-location'),
           language: navigator.language,
           countries: 'de',
+          types: 'country,region,postcode,district,locality,neighborhood',
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
         setHasGeoCoder(true);
