@@ -104,6 +104,11 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUti
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
         setHasGeoCoder(true);
       }
+      const language = navigator.language.includes('de') ? 'de' : 'en'
+      map.setLayoutProperty('country-label', 'text-field', [
+        'get',
+        'name_' + language,
+      ]);
     }
     return () => {
      if (map) {

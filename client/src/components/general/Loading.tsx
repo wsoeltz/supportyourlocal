@@ -1,5 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import styled, {keyframes} from 'styled-components/macro';
+import { GetString } from 'fluent-react/compat';
+import {
+  AppLocalizationAndBundleContext,
+} from '../../contextProviders/getFluentLocalizationContext';
 
 const Root = styled.div`
   background-color: #fbfbfb;
@@ -52,6 +56,8 @@ const Text = styled.div`
 `;
 
 const Loading = () => {
+  const {localization} = useContext(AppLocalizationAndBundleContext);
+  const getFluentString: GetString = (...args) => localization.getString(...args);
   return (
     <Root>
       <Ring>
@@ -60,7 +66,7 @@ const Loading = () => {
         <ThirdChild></ThirdChild>
         <ChildBase></ChildBase>
       </Ring>
-      <Text>Loading...</Text>
+      <Text>{getFluentString('ui-text-loading')}...</Text>
     </Root>
   );
 };

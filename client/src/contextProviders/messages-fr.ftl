@@ -23,3 +23,5 @@ ui-text-find-a-location = Find a location
 
 ui-text-open-menu = Menu
 ui-text-menu-close = Close
+
+ui-text-loading = Loading
