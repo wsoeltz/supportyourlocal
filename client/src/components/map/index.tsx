@@ -42,6 +42,28 @@ const Root = styled.div`
   }
 `;
 
+export interface GeoJsonFeature {
+  type: string,
+  description?: string;
+  place_name?: string;
+  center?: [number, number];
+  address?: string;
+  text?: string;
+  place_type?: [string];
+  properties: {
+    title: string,
+    address: string,
+  },
+  geometry: {
+    coordinates: [number, number],
+    type: string,
+  },
+}
+
+export interface CustomGeoJson {
+  features: GeoJsonFeature[];
+}
+
 export interface MapBounds {
   minLat: number;
   maxLat: number;
@@ -63,6 +85,7 @@ interface Props {
   initialCenter: [number, number] | undefined;
   loading: boolean;
   geocoderSearchElm: HTMLElement | null;
+  customData: CustomGeoJson | undefined;
 }
 
 interface MapUtilProps {
@@ -70,9 +93,10 @@ interface MapUtilProps {
   getMapBounds: (mapBounds: MapBounds) => void;
   geocoderSearchElm: HTMLElement | null;
   getFluentString: GetString;
+  customData: CustomGeoJson | undefined;
 }
 
-const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUtilProps) => {
+const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customData}: MapUtilProps) => {
 
   const [hasGeoCoder, setHasGeoCoder] = useState<boolean>(false);
 
@@ -93,15 +117,69 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUti
     if (map) {
       map.on('dragend', setBounds);
       map.on('zoomend', setBounds);
-      if (geocoderSearchElm && !hasGeoCoder) {
+      if (geocoderSearchElm && !hasGeoCoder && customData !== undefined) {
+
+        const forwardGeocoder = (query: string) => {
+          const matchingFeatures = [];
+          for (let i = 0; i < customData.features.length; i++) {
+            const feature: GeoJsonFeature = customData.features[i];
+            // handle queries with different capitalization than the source data by calling toLowerCase()
+            if (
+              feature.properties.title
+              .toLowerCase()
+              .search(query.toLowerCase()) !== -1
+            ) {
+              // add a tree emoji as a prefix for custom data results
+              // using carmen geojson format: https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
+              feature.place_name = feature.properties.title;
+              feature.center = feature.geometry.coordinates;
+              feature.place_type = ['place'];
+              matchingFeatures.push(feature);
+            }
+          }
+          return matchingFeatures;
+        }
+
         const geocoder = new MapboxGeocoder({
           accessToken,
           mapboxgl,
+          localGeocoder: forwardGeocoder,
           placeholder: getFluentString('ui-text-find-a-location'),
           language: navigator.language,
           countries: 'de',
+          render: (item: any) => {
+            if (item.id) {
+              return `
+              <div class="mapboxgl-ctrl-geocoder--suggestion">
+                <div class="mapboxgl-ctrl-geocoder--suggestion-title">
+                  ${item['text_' + navigator.language]}
+                </div>
+                <div class="mapboxgl-ctrl-geocoder--suggestion-address">
+                  ${item['place_name_' + navigator.language]}
+                </div>
+              </div>
+              `;
+            } else {
+              return `
+              <div class="mapboxgl-ctrl-geocoder--suggestion">
+                <div class="custom_data__container">
+                  <div class="custom_data__icon"></div>
+                  <div class="custom_data__text">
+                    <div class="mapboxgl-ctrl-geocoder--suggestion-title">
+                      ${item.properties.title}
+                    </div>
+                    <div class="mapboxgl-ctrl-geocoder--suggestion-address">
+                      ${item.properties.address}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              `;
+            }
+          }
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
+        geocoder.on('result', (e: any) => console.log(e));
         setHasGeoCoder(true);
       }
       const language = navigator.language.includes('de') ? 'de' : 'en'
@@ -116,7 +194,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString}: MapUti
         map.off('zoomend', setBounds);
       }
     };
-  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString]);
+  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString, customData]);
   return (<></>);
 };
 
@@ -124,6 +202,7 @@ const Map = (props: Props) => {
   const {
     coordinates, highlighted, getMapBounds,
     initialCenter, loading, geocoderSearchElm,
+    customData,
   } = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
@@ -197,6 +276,7 @@ const Map = (props: Props) => {
         getMapBounds={getMapBounds}
         geocoderSearchElm={geocoderSearchElm}
         getFluentString={getFluentString}
+        customData={customData}
       />
     );
   };
