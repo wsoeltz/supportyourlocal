@@ -67,6 +67,15 @@ const RootQuery = new GraphQLObjectType({
         .skip(  pageNumber && nPerPage && pageNumber > 0 ? ( ( pageNumber - 1 ) * nPerPage ) : 0 );
       },
     },
+    getBusinessesFromArray: {
+      type: new GraphQLList(BusinessType),
+      args: {
+        selectionArray: { type: GraphQLList(GraphQLID) },
+      },
+      resolve(parentValue, {selectionArray}: {selectionArray: string[]}) {
+        return Business.find({_id : { $in : selectionArray }});
+      },
+    },
   }),
 });
 

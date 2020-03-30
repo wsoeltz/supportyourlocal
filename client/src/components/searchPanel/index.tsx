@@ -5,6 +5,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
+import sortBy from 'lodash/sortBy';
+import {rgba} from 'polished';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/macro';
 import {
@@ -32,7 +34,6 @@ const Root = styled.div`
 `;
 
 const ScrollContainer = styled.div`
-  padding: 0 1rem;
   height: 100%;
   overflow: auto;
   box-sizing: border-box;
@@ -58,14 +59,14 @@ const ScrollContainer = styled.div`
 
 const Card = styled.div`
   box-sizing: border-box;
-  padding: 0.8rem 0 1.3rem;
+  padding: 0.8rem 1rem 1.3rem;
   border-bottom: solid 1px ${lightBorderColor};
   position: relative;
 
   @media (max-width: ${mobileWidth}px) {
     flex-shrink: 0;
     font-size: 0.9rem;
-    padding: 0 0.8rem;
+    padding: 0.8rem;
     display: flex;
     flex-direction: column;
     border-bottom: none;
@@ -100,7 +101,7 @@ const NoResults = styled.p`
 const ShowOnMap = styled.button`
   position: absolute;
   top: 0.5rem;
-  right: -0.4rem;
+  right: 0;
   background-color: transparent;
   color: ${primaryColor};
   font-size: 1rem;
@@ -114,7 +115,7 @@ const ShowOnMap = styled.button`
 const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
-  margin: 2rem 0;
+  margin: 2rem 1rem;
 
   @media (max-width: ${mobileWidth}px) {
     padding: 1rem;
@@ -155,24 +156,8 @@ const PreviousButton = styled(PageButtonBase)`
 `;
 
 const SEARCH_BUSINESSES = gql`
-  query ListBusinesses(
-    $minLat: Float!,
-    $maxLat: Float!,
-    $minLong: Float!,
-    $maxLong: Float!,
-    $searchQuery: String!,
-    $nPerPage: Int!,
-    $pageNumber: Int!,
-  ) {
-    businesses: searchBusinesses(
-      minLat: $minLat,
-      maxLat: $maxLat,
-      minLong: $minLong,
-      maxLong: $maxLong,
-      searchQuery: $searchQuery,
-      nPerPage: $nPerPage,
-      pageNumber: $pageNumber,
-    ) {
+  query SearchBusinesses($selectionArray: [ID!]) {
+    businesses: getBusinessesFromArray(selectionArray: $selectionArray) {
       id
       name
       address
@@ -185,10 +170,8 @@ const SEARCH_BUSINESSES = gql`
   }
 `;
 
-interface SearchVariables extends MapBounds {
-  searchQuery: string;
-  pageNumber: number;
-  nPerPage: number;
+interface SearchVariables {
+  selectionArray: string[];
 }
 
 interface SuccessResponse {
@@ -207,11 +190,12 @@ interface SuccessResponse {
 interface Props {
   setHighlighted: (value: [Coordinate]) => void;
   mapBounds: MapBounds;
-  searchQuery: string;
+  coordinates: Coordinate[];
+  highlighted: [Coordinate] | undefined;
 }
 
 const SearchPanel = (props: Props) => {
-  const {setHighlighted, mapBounds, searchQuery} = props;
+  const {setHighlighted, mapBounds, coordinates, highlighted} = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
@@ -222,13 +206,17 @@ const SearchPanel = (props: Props) => {
   const incPage = () => setPageNumber(pageNumber + 1);
   const decPage = () => setPageNumber(pageNumber > 0 ? pageNumber - 1 : 0);
 
+  const trimmedCoordinates = coordinates.slice((pageNumber - 1) * nPerPage, nPerPage * pageNumber);
+
+  const selectionArray = trimmedCoordinates.map(({id}) => id);
+
   const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
-    variables: {...mapBounds, searchQuery, nPerPage, pageNumber},
+    variables: {selectionArray},
   });
 
   useEffect(() => {
-    setPageNumber(0);
-  }, [mapBounds, searchQuery, setPageNumber]);
+    setPageNumber(1);
+  }, [mapBounds, setPageNumber]);
 
   const resultsContainerElm = useRef<HTMLDivElement | null>(null);
 
@@ -266,7 +254,18 @@ const SearchPanel = (props: Props) => {
       </NoResults>
     );
   } else {
-    const cards = dataToUse.businesses.map(d => {
+
+    const currentCenter = [
+      (mapBounds.maxLong + mapBounds.minLong) / 2,
+      (mapBounds.maxLat + mapBounds.minLat) / 2,
+    ];
+    const sortedData = sortBy(dataToUse.businesses, (coord) => getDistanceFromLatLonInMiles({
+      lat1: coord.latitude,
+      lat2: currentCenter[1],
+      lon1: coord.longitude,
+      lon2: currentCenter[0],
+    }));
+    const cards = sortedData.map(d => {
       const {
         name, address, website,
         secondaryUrl, industry,
@@ -304,8 +303,10 @@ const SearchPanel = (props: Props) => {
           <br />
         </>
       ) : null;
+      const backgroundColor = highlighted && highlighted[0] && highlighted[0].id === d.id
+        ? rgba(secondaryColor, 0.2) : undefined;
       return (
-        <Card key={d.id}>
+        <Card key={d.id} style={{backgroundColor}}>
           <TitleContainer>
             <Title>{name}</Title>
             <Info>

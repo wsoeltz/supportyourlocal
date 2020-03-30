@@ -19,7 +19,7 @@ import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';
 import usePrevious from '../../hooks/usePrevious';
-import { primaryColor } from '../../styling/styleUtils';
+import { primaryColor, secondaryColor } from '../../styling/styleUtils';
 import StyledPopup from './StyledPopup';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
@@ -43,7 +43,7 @@ const Root = styled.div`
 `;
 
 export interface GeoJsonFeature {
-  type: string,
+  type: string;
   description?: string;
   place_name?: string;
   center?: [number, number];
@@ -53,11 +53,12 @@ export interface GeoJsonFeature {
   properties: {
     title: string,
     address: string,
-  },
+    gqlId: string,
+  };
   geometry: {
     coordinates: [number, number],
     type: string,
-  },
+  };
 }
 
 export interface CustomGeoJson {
@@ -80,6 +81,7 @@ export interface Coordinate {
 interface Props {
   coordinates: Coordinate[];
   highlighted?: Coordinate[];
+  setHighlighted: (value: [Coordinate] | undefined) => void;
   mapBounds: MapBounds;
   getMapBounds: (mapBounds: MapBounds) => void;
   initialCenter: [number, number] | undefined;
@@ -94,10 +96,14 @@ interface MapUtilProps {
   geocoderSearchElm: HTMLElement | null;
   getFluentString: GetString;
   customData: CustomGeoJson | undefined;
+  setHighlighted: (value: [Coordinate] | undefined) => void;
 }
 
-const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customData}: MapUtilProps) => {
-
+const MapUtil = (props: MapUtilProps) => {
+  const {
+    map, getMapBounds, geocoderSearchElm, getFluentString, customData,
+    setHighlighted,
+  } = props;
   const [hasGeoCoder, setHasGeoCoder] = useState<boolean>(false);
 
   useEffect(() => {
@@ -121,8 +127,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customD
 
         const forwardGeocoder = (query: string) => {
           const matchingFeatures = [];
-          for (let i = 0; i < customData.features.length; i++) {
-            const feature: GeoJsonFeature = customData.features[i];
+          for (const feature of customData.features) {
             // handle queries with different capitalization than the source data by calling toLowerCase()
             if (
               feature.properties.title
@@ -138,7 +143,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customD
             }
           }
           return matchingFeatures;
-        }
+        };
 
         const geocoder = new MapboxGeocoder({
           accessToken,
@@ -147,6 +152,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customD
           placeholder: getFluentString('ui-text-find-a-location'),
           language: navigator.language,
           countries: 'de',
+          marker: false,
           render: (item: any) => {
             if (item.id) {
               return `
@@ -176,13 +182,36 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customD
               </div>
               `;
             }
-          }
+          },
+          flyTo: {
+            bearing: 1,
+            // These options control the flight curve, making it move
+            // slowly and zoom out almost completely before starting
+            // to pan.
+            speed: 4, // make the flying slow
+            curve: 1, // change the speed at which it zooms out
+            // This can be any easing function: it takes a number between
+            // 0 and 1 and returns another number between 0 and 1.
+            easing(t: any) {
+              return t;
+            },
+          },
         });
         geocoderSearchElm.appendChild(geocoder.onAdd(map));
-        geocoder.on('result', (e: any) => console.log(e));
+        geocoder.on('result', (e: any) => {
+          if (e.result && e.result.properties && e.result.properties.gqlId) {
+            setHighlighted([{
+              id: e.result.properties.gqlId,
+              latitude: e.result.center[1],
+              longitude: e.result.center[0],
+            }]);
+          } else {
+            setHighlighted(undefined);
+          }
+        });
         setHasGeoCoder(true);
       }
-      const language = navigator.language.includes('de') ? 'de' : 'en'
+      const language = navigator.language.includes('de') ? 'de' : 'en';
       map.setLayoutProperty('country-label', 'text-field', [
         'get',
         'name_' + language,
@@ -194,7 +223,7 @@ const MapUtil = ({map, getMapBounds, geocoderSearchElm, getFluentString, customD
         map.off('zoomend', setBounds);
       }
     };
-  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString, customData]);
+  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString, customData, setHighlighted]);
   return (<></>);
 };
 
@@ -202,7 +231,7 @@ const Map = (props: Props) => {
   const {
     coordinates, highlighted, getMapBounds,
     initialCenter, loading, geocoderSearchElm,
-    customData,
+    customData, setHighlighted,
   } = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
@@ -215,6 +244,7 @@ const Map = (props: Props) => {
 
   const [popupInfo, setPopupInfo] = useState<Coordinate | null>(null);
   const [center, setCenter] = useState<[number, number] | undefined>(initialCenter);
+  const [zoom, setZoom] = useState<[number] | undefined>(undefined);
 
   useEffect(() => {
     if (highlighted && highlighted.length === 1) {
@@ -223,6 +253,7 @@ const Map = (props: Props) => {
         highlighted[0].longitude,
         highlighted[0].latitude,
       ]);
+      setZoom([20]);
     }
   }, [highlighted, setPopupInfo]);
 
@@ -243,6 +274,8 @@ const Map = (props: Props) => {
     const onClick = () => {
       setPopupInfo({...point});
     };
+    const color = highlighted && highlighted[0] && highlighted[0].id === point.id
+      ? secondaryColor : primaryColor;
     return (
       <Feature
         coordinates={[point.longitude, point.latitude]}
@@ -250,7 +283,7 @@ const Map = (props: Props) => {
         onMouseEnter={(event: any) => togglePointer(event.map, 'pointer')}
         onMouseLeave={(event: any) => togglePointer(event.map, '')}
         properties={{
-          'circle-color': primaryColor,
+          'circle-color': color,
         }}
         key={'' + point.latitude + point.longitude}
       />
@@ -277,6 +310,7 @@ const Map = (props: Props) => {
         geocoderSearchElm={geocoderSearchElm}
         getFluentString={getFluentString}
         customData={customData}
+        setHighlighted={setHighlighted}
       />
     );
   };
@@ -293,7 +327,8 @@ const Map = (props: Props) => {
         center={center}
         onClick={() => setPopupInfo(null)}
         fitBoundsOptions={{padding: 50, linear: true}}
-        movingMethod={'flyTo'}
+        movingMethod={'jumpTo'}
+        zoom={zoom}
         key={`mapkey`}
       >
         <ZoomControl />

@@ -1,6 +1,6 @@
+import { GetString } from 'fluent-react/compat';
 import React, {useContext} from 'react';
 import styled, {keyframes} from 'styled-components/macro';
-import { GetString } from 'fluent-react/compat';
 import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';

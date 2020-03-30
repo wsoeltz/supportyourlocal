@@ -1,5 +1,5 @@
+import {CustomGeoJson, GeoJsonFeature} from '../../components/map';
 import {Business} from '../../graphQLTypes';
-import {GeoJsonFeature, CustomGeoJson} from '../../components/map';
 
 interface Datum {
   id: Business['id'];
@@ -16,12 +16,13 @@ export const transformAllData = (data: Datum[]): CustomGeoJson => {
       properties: {
         title: datum.name,
         address: datum.address,
+        gqlId: datum.id,
       },
       geometry: {
         coordinates: [datum.longitude, datum.latitude],
-        type: 'Point'
-      }
-    }
+        type: 'Point',
+      },
+    };
   });
   return { features };
-}
+};

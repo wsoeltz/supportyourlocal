@@ -19,14 +19,12 @@ import { AppContext } from '../../App';
 import LoaderSmall from '../../components/general/LoaderSmall';
 import Map, {Coordinate, MapBounds} from '../../components/map';
 import SearchPanel, {mobileWidth} from '../../components/searchPanel';
-import StandardSearch from '../../components/searchPanel/StandardSearch';
 import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';
 import {
   Business,
 } from '../../graphQLTypes';
-import usePrevious from '../../hooks/usePrevious';
 import { Content } from '../../styling/Grid';
 import {
   borderRadius,
@@ -293,11 +291,6 @@ const SearchAndResultsContainer = styled.div`
   }
 `;
 
-const SearchContainer = styled.div`
-  padding: 1rem 1rem;
-  background-color: #fff;
-`;
-
 const NavLinks = styled.nav`
   flex-grow: 1;
   display: flex;
@@ -401,40 +394,6 @@ const GET_ALL_BUSINESS = gql`
   }
 `;
 
-const SEARCH_BUSINESSES = gql`
-  query ListBusinesses(
-    $minLat: Float!,
-    $maxLat: Float!,
-    $minLong: Float!,
-    $maxLong: Float!,
-    $searchQuery: String!,
-  ) {
-    businesses: searchBusinesses(
-      minLat: $minLat,
-      maxLat: $maxLat,
-      minLong: $minLong,
-      maxLong: $maxLong,
-      searchQuery: $searchQuery,
-    ) {
-      id
-      latitude
-      longitude
-    }
-  }
-`;
-
-interface SearchVariables extends MapBounds {
-  searchQuery: string;
-}
-
-interface SuccessResponse {
-  businesses: Array<{
-    id: Business['id'];
-    latitude: Business['latitude'];
-    longitude: Business['longitude'];
-  }>;
-}
-
 interface AllBusinessesSuccess {
   businesses: Array<{
     id: Business['id'];
@@ -448,7 +407,6 @@ interface AllBusinessesSuccess {
 interface WinodwQuery {
   lat: string | undefined;
   lng: string | undefined;
-  query: string | undefined;
 }
 
 const LandingPage = () => {
@@ -457,11 +415,10 @@ const LandingPage = () => {
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
-  const { lat, lng, query } = queryString.parse(window.location.search);
-  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, query } as WinodwQuery);
-  const initialSearch = windowQuery && windowQuery.query ? query as string : '';
+  const { lat, lng } = queryString.parse(window.location.search);
+  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng } as WinodwQuery);
 
-  const {data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
+  const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
 
   useEffect(() => window.history.replaceState({}, document.title, '/'), []);
@@ -491,7 +448,6 @@ const LandingPage = () => {
   const [center, setCenter] = useState<[number, number]>(initialCenter);
   const [mapBounds, setMapBounds] = useState<MapBounds>({...initialMapBounds});
   const [preciseMapBounds, setPreciseMapBounds] = useState<MapBounds>({...initialMapBounds});
-  const [searchQuery, setSearchQuery] = useState<string>('');
   const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(undefined);
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -558,18 +514,31 @@ const LandingPage = () => {
     setPreciseMapBounds({...newMapBounds});
   };
 
-  const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
-    variables: {...mapBounds, searchQuery},
-  });
-
   const isLoading = loading || userLocation === undefined;
-  const prevData = usePrevious(data);
-  const dataToUse = loading === true ? prevData : data;
 
   let coordinates: Coordinate[];
-  if (dataToUse !== undefined) {
-    const { businesses } = dataToUse;
-    coordinates = sortBy(businesses, ['name']);
+  if (allData !== undefined) {
+    const { businesses } = allData;
+    coordinates = businesses.filter(business => {
+      if (
+        business.latitude > preciseMapBounds.minLat && business.latitude < preciseMapBounds.maxLat &&
+        business.longitude > preciseMapBounds.minLong && business.longitude < preciseMapBounds.maxLong
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+    const currentCenter = [
+      (preciseMapBounds.maxLong + preciseMapBounds.minLong) / 2,
+      (preciseMapBounds.maxLat + preciseMapBounds.minLat) / 2,
+    ];
+    coordinates = sortBy(coordinates, (coord) => getDistanceFromLatLonInMiles({
+      lat1: coord.latitude,
+      lat2: currentCenter[1],
+      lon1: coord.longitude,
+      lon2: currentCenter[0],
+    }));
   } else if (isLoading) {
     coordinates = [];
   } else if (error !== undefined) {
@@ -695,6 +664,7 @@ const LandingPage = () => {
             loading={isLoading}
             geocoderSearchElm={geocoderSearchElm}
             customData={allBusiness}
+            setHighlighted={setHighlighted}
             key={'main-map'}
           />
 
@@ -708,18 +678,11 @@ const LandingPage = () => {
                 {usersLocationButtonContent}
               </UseMyLocation>
             </GeoCoderSearchContainer>
-            <SearchContainer>
-              <StandardSearch
-                placeholder={getFluentString('ui-text-search-for-a-shop-placegholer')}
-                initialQuery={initialSearch}
-                setSearchQuery={setSearchQuery}
-                focusOnMount={false}
-              />
-            </SearchContainer>
             <SearchPanel
               setHighlighted={setHighlighted}
               mapBounds={preciseMapBounds}
-              searchQuery={searchQuery}
+              coordinates={coordinates}
+              highlighted={highlighted}
             />
           </SearchAndResultsContainer>
 
