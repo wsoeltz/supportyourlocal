@@ -62,6 +62,7 @@ const GeoCoderSearchContainer = styled.div`
 const GeoCoderSearchLoader = styled.div`
   position: absolute;
   width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -447,6 +448,7 @@ const LandingPage = () => {
   const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(undefined);
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [loadingUsersLocation, setLoadingUsersLocation] = useState<boolean>(false);
 
   useEffect(() => {
     if (userLocation && (!windowQuery || (!windowQuery.lat && !windowQuery.lng))) {
@@ -531,18 +533,24 @@ const LandingPage = () => {
   }
 
   const getUsersLocation = () => {
+    setLoadingUsersLocation(true);
     const onSuccess = ({coords: {latitude, longitude}}: Position) => {
       setCenter([longitude + (Math.random() * 0.00001), latitude + (Math.random() * 0.00001)]);
       setUserLocation({latitude, longitude});
       setWindowQuery(undefined);
+      setLoadingUsersLocation(false);
     };
     const onError = () => {
       console.error('Unable to retrieve your location');
+      setLoadingUsersLocation(false);
     };
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(onSuccess, onError);
     }
   };
+
+  const usersLocationButtonContent = loadingUsersLocation
+    ? <LoaderSmall color={primaryColor} /> : <FontAwesomeIcon icon={faStreetView} />;
 
   const defaultMetaTitle = getFluentString('meta-data-base-title');
   const defaultMetaDescription = getFluentString('meta-data-base-description');
@@ -649,7 +657,7 @@ const LandingPage = () => {
                 <LocationIcon icon={faMapMarkerAlt} />
               </GeoCoderSearch>
               <UseMyLocation onClick={getUsersLocation}>
-                <FontAwesomeIcon icon={faStreetView} />
+                {usersLocationButtonContent}
               </UseMyLocation>
             </GeoCoderSearchContainer>
             <SearchContainer>
