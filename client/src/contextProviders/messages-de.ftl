@@ -24,4 +24,4 @@ ui-text-find-a-location = Deine Stadt
 ui-text-open-menu = Menü
 ui-text-menu-close = Schließen
 
-ui-text-loading = Loading
+ui-text-loading = Lade Karte
