@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import {
   faMapMarkerAlt,
 } from '@fortawesome/free-solid-svg-icons';
@@ -187,6 +187,24 @@ interface SuccessResponse {
   }>;
 }
 
+const UPDATE_CLICK_HISTORY = gql`
+  mutation UpdateClickHisory($id: ID!) {
+    business: updateClickHistory (id: $id) {
+      id
+    }
+  }
+`;
+
+interface ClickHistorySuccess {
+  business: {
+    id: Business['id'];
+  };
+}
+
+interface ClickHistoryVariables {
+  id: Business['id'];
+}
+
 interface Props {
   setHighlighted: (value: [Coordinate]) => void;
   mapBounds: MapBounds;
@@ -210,6 +228,7 @@ const SearchPanel = (props: Props) => {
 
   const selectionArray = trimmedCoordinates.map(({id}) => id);
 
+  const [updateClickHistory] = useMutation<ClickHistorySuccess, ClickHistoryVariables>(UPDATE_CLICK_HISTORY);
   const {loading, error, data} = useQuery<SuccessResponse, SearchVariables>(SEARCH_BUSINESSES, {
     variables: {selectionArray},
   });
@@ -270,9 +289,11 @@ const SearchPanel = (props: Props) => {
         name, address, website,
         secondaryUrl, industry,
       } = d;
+      const onClick = () => updateClickHistory({variables: {id: d.id}});
       const websiteLink = website
         ? (
             <LinkButton
+              onClick={onClick}
               href={website}
               target='_blank'
               rel='noopener noreferrer'
@@ -286,6 +307,7 @@ const SearchPanel = (props: Props) => {
       if (secondaryUrl) {
         secondaryLink = (
           <LinkButton
+            onClick={onClick}
             href={secondaryUrl}
             target='_blank'
             rel='noopener noreferrer'

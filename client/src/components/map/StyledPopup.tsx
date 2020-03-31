@@ -1,4 +1,4 @@
-import { useQuery } from '@apollo/react-hooks';
+import { useMutation, useQuery } from '@apollo/react-hooks';
 import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
 import React from 'react';
@@ -88,6 +88,20 @@ interface SuccessResponse {
   };
 }
 
+const UPDATE_CLICK_HISTORY = gql`
+  mutation UpdateClickHisory($id: ID!) {
+    business: updateClickHistory (id: $id) {
+      id
+    }
+  }
+`;
+
+interface ClickHistorySuccess {
+  business: {
+    id: Business['id'];
+  };
+}
+
 interface Variables {
   id: string;
 }
@@ -109,6 +123,8 @@ const StyledPopup = (props: Props) => {
   const {loading, error, data} = useQuery<SuccessResponse, Variables>(FIND_BUSINESS, {
     variables: {id},
   });
+  const [updateClickHistory] = useMutation<ClickHistorySuccess, Variables>(UPDATE_CLICK_HISTORY);
+  const onClick = () => updateClickHistory({variables: {id}});
 
   let output: React.ReactElement<any> | null;
   if (loading) {
@@ -139,6 +155,7 @@ const StyledPopup = (props: Props) => {
             target='_blank'
             rel='noopener noreferrer'
             data-clickout='website'
+            onClick={onClick}
           >
             {getFluentString('ui-text-view-website')}
           </LinkButton>
@@ -152,6 +169,7 @@ const StyledPopup = (props: Props) => {
           target='_blank'
           rel='noopener noreferrer'
           data-clickout='vouchershop'
+          onClick={onClick}
         >
           {getFluentString('ui-text-visit-voucher-shop')}
         </LinkButton>

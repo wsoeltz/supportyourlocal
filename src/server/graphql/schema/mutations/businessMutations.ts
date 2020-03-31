@@ -109,6 +109,29 @@ const businessMutations: any = {
       }
     },
   },
+  updateClickHistory: {
+    type: BusinessType,
+    args: {
+      id: { type: GraphQLNonNull(GraphQLID) },
+    },
+    async resolve(_unused: any, {id}: {id: string}) {
+      try {
+        const business = await Business.findOne({ _id: id });
+        if (business) {
+          const clickCount = business.clickCount ? business.clickCount + 1 : 1;
+          const mostRecentClick = new Date();
+          const newBusiness = await Business.findOneAndUpdate({ _id: id },
+            { mostRecentClick, clickCount },
+            {new: true});
+          return newBusiness;
+        } else {
+          return null;
+        }
+      } catch (err) {
+        return err;
+      }
+    },
+  },
 
 };
 

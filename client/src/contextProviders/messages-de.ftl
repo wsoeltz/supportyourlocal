@@ -4,7 +4,7 @@ meta-data-base-description = Unterstütze während der Corona-Quarantäne Gesch�
 base-title-no-hash = supportyourlocal
 
 navigation-links-mission = Unsere Mission
-navigation-links-favorite-places = Favorite Places
+navigation-links-favorite-places = Lieblingsorte
 navigation-links-for-shop-owners = Für Unternehmen
 navigation-links-about = Über uns
 

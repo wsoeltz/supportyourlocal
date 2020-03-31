@@ -76,6 +76,16 @@ const RootQuery = new GraphQLObjectType({
         return Business.find({_id : { $in : selectionArray }});
       },
     },
+    clickHistory: {
+      type: new GraphQLList(BusinessType),
+      args: { limit: { type: GraphQLInt } },
+      resolve(parentValue, { limit }) {
+        return (Business as any)
+          .find({mostRecentClick: { $exists: true, $ne: null } })
+          .limit(limit ? limit : 0)
+          .sort({mostRecentClick: -1});
+      },
+    },
   }),
 });
 

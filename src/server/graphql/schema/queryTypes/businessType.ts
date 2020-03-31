@@ -1,6 +1,7 @@
 import {
   GraphQLFloat,
   GraphQLID,
+  GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
@@ -29,6 +30,8 @@ const BusinessSchema = new Schema({
   description: { type: String },
   latitude: { type: Number },
   longitude: { type: Number },
+  clickCount: { type: Number },
+  mostRecentClick: { type: Date },
 });
 
 export const Business: BusinessModelType = mongoose.model<BusinessModelType, any>('Business', BusinessSchema);
@@ -52,6 +55,8 @@ const BusinessType: any = new GraphQLObjectType({
     description: { type: GraphQLString },
     latitude: { type: GraphQLNonNull(GraphQLFloat) },
     longitude: { type: GraphQLNonNull(GraphQLFloat) },
+    clickCount: { type: GraphQLInt },
+    mostRecentClick: { type: GraphQLString },
   }),
 });
 

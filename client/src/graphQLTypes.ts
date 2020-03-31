@@ -20,4 +20,11 @@ export interface Business {
   description: string | null;
   latitude: number;
   longitude: number;
+  clickCount: number | null;
+  mostRecentClick: Date;
+}
+
+export interface ClickHistory {
+  business: Business;
+  date: Date;
 }
