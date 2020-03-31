@@ -195,18 +195,18 @@ const GeneralGeoCoderDataDownload = () => {
           });
           if (!exists) {
             cleanedData.push({
-              externalId: externalId.length ? externalId : null,
-              source: source.length ? externalId : null,
+              externalId: externalId && externalId.length ? externalId : null,
+              source: source && source.length ? externalId : null,
               name,
               address,
-              city: city.length ? city : null,
-              country,
-              email: email.length ? email : null,
-              website: website.length ? website : null,
-              secondaryUrl: secondaryUrl.length ? secondaryUrl : null,
-              logo,
-              images: images.length ? [images] : null,
-              industry,
+              city: city && city.length ? city : null,
+              country: country && country.length ? country : null,
+              email: email && email.length ? email : null,
+              website: website && website.length ? website : null,
+              secondaryUrl: secondaryUrl && secondaryUrl.length ? secondaryUrl : null,
+              logo: logo && logo.length ? logo : null,
+              images: images && images.length ? [images] : null,
+              industry: industry && industry.length ? industry : null,
               latitude: parseFloat(latitude),
               longitude: parseFloat(longitude),
             });
@@ -217,7 +217,9 @@ const GeneralGeoCoderDataDownload = () => {
     };
     const getCSVData = async () => {
       try {
+        console.log(url);
         if (url && url.length) {
+          console.log('has url');
           const res = await axios.get(url);
           if (res && res.data) {
             csv().fromString(res.data).then((json: BusinessRaw[]) => cleanData(json));
