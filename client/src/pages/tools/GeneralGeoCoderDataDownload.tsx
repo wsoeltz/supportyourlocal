@@ -217,9 +217,7 @@ const GeneralGeoCoderDataDownload = () => {
     };
     const getCSVData = async () => {
       try {
-        console.log(url);
         if (url && url.length) {
-          console.log('has url');
           const res = await axios.get(url);
           if (res && res.data) {
             csv().fromString(res.data).then((json: BusinessRaw[]) => cleanData(json));
