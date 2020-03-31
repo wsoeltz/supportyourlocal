@@ -518,27 +518,37 @@ const LandingPage = () => {
 
   let coordinates: Coordinate[];
   if (allData !== undefined) {
-    const { businesses } = allData;
-    coordinates = businesses.filter(business => {
-      if (
-        business.latitude > preciseMapBounds.minLat && business.latitude < preciseMapBounds.maxLat &&
-        business.longitude > preciseMapBounds.minLong && business.longitude < preciseMapBounds.maxLong
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+    const range = getDistanceFromLatLonInMiles({
+      lat1: preciseMapBounds.minLat,
+      lat2: preciseMapBounds.maxLat,
+      lon1: preciseMapBounds.maxLong,
+      lon2: preciseMapBounds.minLong,
     });
-    const currentCenter = [
-      (preciseMapBounds.maxLong + preciseMapBounds.minLong) / 2,
-      (preciseMapBounds.maxLat + preciseMapBounds.minLat) / 2,
-    ];
-    coordinates = sortBy(coordinates, (coord) => getDistanceFromLatLonInMiles({
-      lat1: coord.latitude,
-      lat2: currentCenter[1],
-      lon1: coord.longitude,
-      lon2: currentCenter[0],
-    }));
+    if (range > 500) {
+      coordinates = [];
+    } else {
+      const { businesses } = allData;
+      coordinates = businesses.filter(business => {
+        if (
+          business.latitude > preciseMapBounds.minLat && business.latitude < preciseMapBounds.maxLat &&
+          business.longitude > preciseMapBounds.minLong && business.longitude < preciseMapBounds.maxLong
+        ) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+      const currentCenter = [
+        (preciseMapBounds.maxLong + preciseMapBounds.minLong) / 2,
+        (preciseMapBounds.maxLat + preciseMapBounds.minLat) / 2,
+      ];
+      coordinates = sortBy(coordinates, (coord) => getDistanceFromLatLonInMiles({
+        lat1: coord.latitude,
+        lat2: currentCenter[1],
+        lon1: coord.longitude,
+        lon2: currentCenter[0],
+      }));
+    }
   } else if (isLoading) {
     coordinates = [];
   } else if (error !== undefined) {

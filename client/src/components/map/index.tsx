@@ -129,7 +129,7 @@ const MapUtil = (props: MapUtilProps) => {
 
     const clusterClick = (e: any) => {
       const features = map.queryRenderedFeatures(e.point, {
-        layers: ['cluster_layer'],
+        layers: ['cluster_count'],
       });
       const clusterId = features[0].properties.cluster_id;
       if (clusterId !== undefined) {
@@ -218,7 +218,7 @@ const MapUtil = (props: MapUtilProps) => {
       }
     };
 
-    map.on('click', 'cluster_layer', clusterClick);
+    map.on('click', 'cluster_count', clusterClick);
     map.on('click', 'clustered_text', clusterTextClick);
 
     if (geocoderSearchElm && !hasGeoCoder && customData !== undefined) {
@@ -318,7 +318,7 @@ const MapUtil = (props: MapUtilProps) => {
      if (map) {
         map.off('dragend', setBounds);
         map.off('zoomend', setBounds);
-        map.off('click', 'cluster_layer', clusterClick);
+        map.off('click', 'cluster_count', clusterClick);
         map.off('click', 'clustered_text', clusterTextClick);
       }
     };
