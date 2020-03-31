@@ -6,6 +6,8 @@ import express from 'express';
 import expressGraphQL from 'express-graphql';
 import { redirectToHTTPS } from 'express-http-to-https';
 import mongoose from 'mongoose';
+import recentClicks from './api/recentClicks';
+import topClicks from './api/topClicks';
 import buildDataloaders from './dataloaders';
 import schema from './graphql/schema';
 
@@ -58,6 +60,31 @@ app.use('/graphql', expressGraphQL((req: any) => ({
 ///// End MongoDb Connection Setup
 
 if (process.env.NODE_ENV === 'production') {
+
+  app.get('/api/recent_clicks', async (req, res) => {
+    try {
+      const limit = req.query && req.query.limit ? parseInt(req.query.limit, 10)  : 10;
+      const businesses = await recentClicks({limit});
+      res.json(businesses);
+    } catch (err) {
+      res.status(500);
+      res.send(err);
+    }
+  });
+
+  app.get('/api/top_clicks', async (req, res) => {
+    try {
+      const limit = req.query && req.query.limit ? parseInt(req.query.limit, 10)  : 10;
+      const lat = req.query && req.query.lat ? parseFloat(req.query.lat)  : undefined;
+      const lng = req.query && req.query.lng ? parseFloat(req.query.lng)  : undefined;
+      const range = req.query && req.query.range ? parseFloat(req.query.range)  : undefined;
+      const businesses = await topClicks({limit, lat, lng, range});
+      res.json(businesses);
+    } catch (err) {
+      res.status(500);
+      res.send(err);
+    }
+  });
 
   const path = require('path');
 

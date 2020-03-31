@@ -149,7 +149,6 @@ const GeneralGeoCoderDataDownload = () => {
   const [data, setData] = useState<Variables[] | undefined>(undefined);
 
   const {data: graphqlData} = useQuery<SuccessResponse>(GET_ALL_BUSINESSES);
-
   let isDataClean: boolean;
   if (key === process.env.REACT_APP_SECRET_DATA_UPLOAD_KEY && data) {
     isDataClean = true;
