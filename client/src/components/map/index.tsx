@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import ReactMapboxGl, {
   Feature,
+  GeoJSONLayer,
   Layer,
   MapContext,
   RotationControl,
@@ -20,6 +21,7 @@ import {
 } from '../../contextProviders/getFluentLocalizationContext';
 import usePrevious from '../../hooks/usePrevious';
 import { primaryColor, secondaryColor } from '../../styling/styleUtils';
+import {getDistanceFromLatLonInMiles} from '../../Utils';
 import StyledPopup from './StyledPopup';
 
 const accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ? process.env.REACT_APP_MAPBOX_ACCESS_TOKEN : '';
@@ -97,12 +99,13 @@ interface MapUtilProps {
   getFluentString: GetString;
   customData: CustomGeoJson | undefined;
   setHighlighted: (value: [Coordinate] | undefined) => void;
+  setPopupInfo: (value: Coordinate | null) => void;
 }
 
 const MapUtil = (props: MapUtilProps) => {
   const {
     map, getMapBounds, geocoderSearchElm, getFluentString, customData,
-    setHighlighted,
+    setHighlighted, setPopupInfo,
   } = props;
   const [hasGeoCoder, setHasGeoCoder] = useState<boolean>(false);
 
@@ -120,110 +123,209 @@ const MapUtil = (props: MapUtilProps) => {
         maxLong: newMaxLong,
       });
     }, 500);
-    if (map) {
-      map.on('dragend', setBounds);
-      map.on('zoomend', setBounds);
-      if (geocoderSearchElm && !hasGeoCoder && customData !== undefined) {
 
-        const forwardGeocoder = (query: string) => {
-          const matchingFeatures = [];
-          for (const feature of customData.features) {
-            // handle queries with different capitalization than the source data by calling toLowerCase()
-            if (
-              feature.properties.title
-              .toLowerCase()
-              .search(query.toLowerCase()) !== -1
-            ) {
-              // add a tree emoji as a prefix for custom data results
-              // using carmen geojson format: https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
-              feature.place_name = feature.properties.title;
-              feature.center = feature.geometry.coordinates;
-              feature.place_type = ['place'];
-              matchingFeatures.push(feature);
+    map.on('dragend', setBounds);
+    map.on('zoomend', setBounds);
+
+    const clusterClick = (e: any) => {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ['cluster_layer'],
+      });
+      const clusterId = features[0].properties.cluster_id;
+      if (clusterId !== undefined) {
+        map.getSource('source_id').getClusterExpansionZoom(
+          clusterId,
+          function(err: any, zoom: any) {
+            if (err) {
+              return;
             }
+            map.easeTo({
+              center: features[0].geometry.coordinates,
+              zoom,
+            });
+          },
+        );
+      } else {
+        if (customData) {
+          const match = customData.features.find(({geometry: {coordinates}}) => {
+            const distance = getDistanceFromLatLonInMiles({
+              lat1: coordinates[1],
+              lat2: e.lngLat.lat,
+              lon1: coordinates[0],
+              lon2: e.lngLat.lng,
+            });
+            return distance < 0.25;
+          });
+          if (match) {
+            const animationDuration = 600;
+            map.easeTo({
+              center: match.geometry.coordinates,
+              zoom: 13,
+              duration: animationDuration,
+            });
+            setPopupInfo({
+              latitude: match.geometry.coordinates[1],
+              longitude: match.geometry.coordinates[0],
+              id: match.properties.gqlId,
+            });
           }
-          return matchingFeatures;
-        };
+        }
+      }
+    };
+    const clusterTextClick = (e: any) => {
+      const features = map.queryRenderedFeatures(e.point, {
+        layers: ['clustered_text'],
+      });
+      const clusterId = features[0].properties.cluster_id;
+      if (clusterId !== undefined) {
+        map.getSource('source_id').getClusterExpansionZoom(
+          clusterId,
+          function(err: any, zoom: any) {
+            if (err) {
+              return;
+            }
+            map.easeTo({
+              center: features[0].geometry.coordinates,
+              zoom,
+            });
+          },
+        );
+      } else {
+        if (customData) {
+          const match = customData.features.find(({geometry: {coordinates}}) => {
+            const distance = getDistanceFromLatLonInMiles({
+              lat1: coordinates[1],
+              lat2: e.lngLat.lat,
+              lon1: coordinates[0],
+              lon2: e.lngLat.lng,
+            });
+            return distance < 0.25;
+          });
+          if (match) {
+            const animationDuration = 600;
+            map.easeTo({
+              center: match.geometry.coordinates,
+              zoom: 13,
+              duration: animationDuration,
+            });
+            setPopupInfo({
+              latitude: match.geometry.coordinates[1],
+              longitude: match.geometry.coordinates[0],
+              id: match.properties.gqlId,
+            });
+          }
+        }
+      }
+    };
 
-        const geocoder = new MapboxGeocoder({
-          accessToken,
-          mapboxgl,
-          localGeocoder: forwardGeocoder,
-          placeholder: getFluentString('ui-text-find-a-location'),
-          language: navigator.language,
-          countries: 'de',
-          marker: false,
-          render: (item: any) => {
-            if (item.id) {
-              return `
-              <div class="mapboxgl-ctrl-geocoder--suggestion">
-                <div class="mapboxgl-ctrl-geocoder--suggestion-title">
-                  ${item['text_' + navigator.language]}
-                </div>
-                <div class="mapboxgl-ctrl-geocoder--suggestion-address">
-                  ${item['place_name_' + navigator.language]}
-                </div>
+    map.on('click', 'cluster_layer', clusterClick);
+    map.on('click', 'clustered_text', clusterTextClick);
+
+    if (geocoderSearchElm && !hasGeoCoder && customData !== undefined) {
+
+      const forwardGeocoder = (query: string) => {
+        const matchingFeatures = [];
+        for (const feature of customData.features) {
+          // handle queries with different capitalization than the source data by calling toLowerCase()
+          if (
+            feature.properties.title
+            .toLowerCase()
+            .search(query.toLowerCase()) !== -1
+          ) {
+            // add a tree emoji as a prefix for custom data results
+            // using carmen geojson format: https://github.com/mapbox/carmen/blob/master/carmen-geojson.md
+            feature.place_name = feature.properties.title;
+            feature.center = feature.geometry.coordinates;
+            feature.place_type = ['place'];
+            matchingFeatures.push(feature);
+          }
+        }
+        return matchingFeatures;
+      };
+
+      const geocoder = new MapboxGeocoder({
+        accessToken,
+        mapboxgl,
+        localGeocoder: forwardGeocoder,
+        placeholder: getFluentString('ui-text-find-a-location'),
+        language: navigator.language,
+        countries: 'de',
+        marker: false,
+        render: (item: any) => {
+          if (item.id) {
+            return `
+            <div class="mapboxgl-ctrl-geocoder--suggestion">
+              <div class="mapboxgl-ctrl-geocoder--suggestion-title">
+                ${item['text_' + navigator.language]}
               </div>
-              `;
-            } else {
-              return `
-              <div class="mapboxgl-ctrl-geocoder--suggestion">
-                <div class="custom_data__container">
-                  <div class="custom_data__icon"></div>
-                  <div class="custom_data__text">
-                    <div class="mapboxgl-ctrl-geocoder--suggestion-title">
-                      ${item.properties.title}
-                    </div>
-                    <div class="mapboxgl-ctrl-geocoder--suggestion-address">
-                      ${item.properties.address}
-                    </div>
+              <div class="mapboxgl-ctrl-geocoder--suggestion-address">
+                ${item['place_name_' + navigator.language]}
+              </div>
+            </div>
+            `;
+          } else {
+            return `
+            <div class="mapboxgl-ctrl-geocoder--suggestion">
+              <div class="custom_data__container">
+                <div class="custom_data__icon"></div>
+                <div class="custom_data__text">
+                  <div class="mapboxgl-ctrl-geocoder--suggestion-title">
+                    ${item.properties.title}
+                  </div>
+                  <div class="mapboxgl-ctrl-geocoder--suggestion-address">
+                    ${item.properties.address}
                   </div>
                 </div>
               </div>
-              `;
-            }
-          },
-          flyTo: {
-            bearing: 1,
-            // These options control the flight curve, making it move
-            // slowly and zoom out almost completely before starting
-            // to pan.
-            speed: 4, // make the flying slow
-            curve: 1, // change the speed at which it zooms out
-            // This can be any easing function: it takes a number between
-            // 0 and 1 and returns another number between 0 and 1.
-            easing(t: any) {
-              return t;
-            },
-          },
-        });
-        geocoderSearchElm.appendChild(geocoder.onAdd(map));
-        geocoder.on('result', (e: any) => {
-          if (e.result && e.result.properties && e.result.properties.gqlId) {
-            setHighlighted([{
-              id: e.result.properties.gqlId,
-              latitude: e.result.center[1],
-              longitude: e.result.center[0],
-            }]);
-          } else {
-            setHighlighted(undefined);
+            </div>
+            `;
           }
-        });
-        setHasGeoCoder(true);
-      }
-      const language = navigator.language.includes('de') ? 'de' : 'en';
-      map.setLayoutProperty('country-label', 'text-field', [
-        'get',
-        'name_' + language,
-      ]);
+        },
+        flyTo: {
+          bearing: 1,
+          // These options control the flight curve, making it move
+          // slowly and zoom out almost completely before starting
+          // to pan.
+          speed: 4, // make the flying slow
+          curve: 1, // change the speed at which it zooms out
+          // This can be any easing function: it takes a number between
+          // 0 and 1 and returns another number between 0 and 1.
+          easing(t: any) {
+            return t;
+          },
+        },
+      });
+      geocoderSearchElm.appendChild(geocoder.onAdd(map));
+      geocoder.on('result', (e: any) => {
+        if (e.result && e.result.properties && e.result.properties.gqlId) {
+          setHighlighted([{
+            id: e.result.properties.gqlId,
+            latitude: e.result.center[1],
+            longitude: e.result.center[0],
+          }]);
+        } else {
+          setHighlighted(undefined);
+        }
+      });
+      setHasGeoCoder(true);
     }
+    const language = navigator.language.includes('de') ? 'de' : 'en';
+    map.setLayoutProperty('country-label', 'text-field', [
+      'get',
+      'name_' + language,
+    ]);
     return () => {
      if (map) {
         map.off('dragend', setBounds);
         map.off('zoomend', setBounds);
+        map.off('click', 'cluster_layer', clusterClick);
+        map.off('click', 'clustered_text', clusterTextClick);
       }
     };
-  }, [map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString, customData, setHighlighted]);
+  }, [
+    map, getMapBounds, geocoderSearchElm, hasGeoCoder, getFluentString,
+    customData, setHighlighted, setPopupInfo,
+  ]);
   return (<></>);
 };
 
@@ -311,8 +413,22 @@ const Map = (props: Props) => {
         getFluentString={getFluentString}
         customData={customData}
         setHighlighted={setHighlighted}
+        setPopupInfo={setPopupInfo}
       />
     );
+  };
+
+  const geoJsonClusterData = {
+    type: 'FeatureCollection',
+    features: coordinates.map(coord => ({
+      type: 'Feature',
+      properties: {
+        gqlId: coord.id,
+      },
+      geometry: {
+        coordinates: [coord.longitude, coord.latitude],
+      },
+    })),
   };
 
   return (
@@ -333,9 +449,69 @@ const Map = (props: Props) => {
       >
         <ZoomControl />
         <RotationControl style={{ top: 80 }} />
+        <GeoJSONLayer
+          id='source_id'
+          data={geoJsonClusterData}
+          sourceOptions={{
+            cluster: true,
+            clusterMaxZoom: 11,
+            clusterRadius: 50,
+          }}
+        />
+        <Layer
+          id='cluster_count'
+          sourceId='source_id'
+          maxZoom={12}
+          layerOptions={{
+            filter: [
+              'has', 'point_count',
+            ],
+          }}
+          paint={{
+            'circle-color': {
+              property: 'point_count',
+              type: 'interval',
+              stops: [
+                [0, primaryColor],
+                [100, primaryColor],
+                [750, primaryColor],
+              ],
+            },
+            'circle-radius': {
+              property: 'point_count',
+              type: 'interval',
+              stops: [
+                [0, 15],
+                [100, 23],
+                [750, 32],
+              ],
+            },
+          }}
+          type='circle'
+        />
+        <Layer
+          type='symbol'
+          id={'clustered_text'}
+          sourceId='source_id'
+          layout={{
+            'text-field': '{point_count}',
+            'text-font': [
+              'DIN Offc Pro Medium',
+              'Arial Unicode MS Bold',
+            ],
+            'text-size': 12,
+          }}
+          paint={{
+            'text-color': '#fff',
+          }}
+          layerOptions={{
+            filter: ['has', 'point_count'],
+          }}
+        />
         <Layer
           type='circle'
           id='marker'
+          minZoom={12}
           paint={{
             'circle-color': ['get', 'circle-color'],
             'circle-radius': {
