@@ -78,7 +78,7 @@ const FIND_BUSINESS = gql`
 `;
 
 interface SuccessResponse {
-  business: {
+  business: null | {
     id: Business['id'];
     name: Business['name'];
     address: Business['address'];
@@ -132,7 +132,7 @@ const StyledPopup = (props: Props) => {
   } else if (error) {
     console.error(error);
     output = null;
-  } else if (data !== undefined) {
+  } else if (data !== undefined && data.business) {
     const {
       business: {
         name, address, website,

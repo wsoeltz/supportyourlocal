@@ -346,7 +346,7 @@ const Map = (props: Props) => {
 
   const [popupInfo, setPopupInfo] = useState<Coordinate | null>(null);
   const [center, setCenter] = useState<[number, number] | undefined>(initialCenter);
-  const [zoom, setZoom] = useState<[number] | undefined>(undefined);
+  const [zoom, setZoom] = useState<[number] | undefined>([13]);
 
   useEffect(() => {
     if (highlighted && highlighted.length === 1) {

@@ -16,19 +16,19 @@ const app = express();
 
 app.use(redirectToHTTPS([/localhost:(\d{4})/], undefined, 301));
 
-var whitelist = [
+const whitelist = [
   'https://www.supportyourlocal.online',
   'https://supportyourlocal.webflow.io',
-]
-var corsOptions = {
-  origin: function (origin: string, callback: (value1?: any, value2?: boolean) => any) {
+];
+const corsOptions = {
+  origin(origin: string, callback: (value1?: any, value2?: boolean) => any) {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
-      callback(null, true)
+      callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'))
+      callback(new Error('Not allowed by CORS'));
     }
-  }
-}
+  },
+};
 
 if (process.env.NODE_ENV === 'development') {
   // Allow all cors requests on development

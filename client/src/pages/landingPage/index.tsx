@@ -407,6 +407,7 @@ interface AllBusinessesSuccess {
 interface WinodwQuery {
   lat: string | undefined;
   lng: string | undefined;
+  tooltipId: string | undefined;
 }
 
 const LandingPage = () => {
@@ -415,8 +416,8 @@ const LandingPage = () => {
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
-  const { lat, lng } = queryString.parse(window.location.search);
-  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng } as WinodwQuery);
+  const { lat, lng, tooltipId } = queryString.parse(window.location.search);
+  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
 
   const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
@@ -445,10 +446,19 @@ const LandingPage = () => {
     (initialMapBounds.maxLat + initialMapBounds.minLat) / 2,
   ];
 
+  const initialHighlighted: [Coordinate] | undefined =
+    windowQuery && windowQuery.tooltipId && windowQuery.lat && windowQuery.lng
+      ? [{
+          id: windowQuery.tooltipId,
+          latitude: parseFloat(windowQuery.lat),
+          longitude: parseFloat(windowQuery.lng),
+        }]
+      : undefined;
+
   const [center, setCenter] = useState<[number, number]>(initialCenter);
   const [mapBounds, setMapBounds] = useState<MapBounds>({...initialMapBounds});
   const [preciseMapBounds, setPreciseMapBounds] = useState<MapBounds>({...initialMapBounds});
-  const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(undefined);
+  const [highlighted, setHighlighted] = useState<[Coordinate] | undefined>(initialHighlighted);
   const [geocoderSearchElm, setGeocoderSearchElm] = useState<HTMLElement | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [loadingUsersLocation, setLoadingUsersLocation] = useState<boolean>(false);
