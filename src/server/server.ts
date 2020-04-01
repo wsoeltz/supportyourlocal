@@ -16,6 +16,20 @@ const app = express();
 
 app.use(redirectToHTTPS([/localhost:(\d{4})/], undefined, 301));
 
+var whitelist = [
+  'https://www.supportyourlocal.online',
+  'https://supportyourlocal.webflow.io',
+]
+var corsOptions = {
+  origin: function (origin: string, callback: (value1?: any, value2?: boolean) => any) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
 if (process.env.NODE_ENV === 'development') {
   // Allow all cors requests on development
   app.use(cors());
@@ -62,7 +76,7 @@ app.use('/graphql', expressGraphQL((req: any) => ({
 
 if (process.env.NODE_ENV === 'production') {
 
-  app.get('/api/global_data', async (req, res) => {
+  app.get('/api/global_data', cors(corsOptions), async (req, res) => {
     try {
       const data = await globalData();
       res.json(data);
@@ -72,7 +86,7 @@ if (process.env.NODE_ENV === 'production') {
     }
   });
 
-  app.get('/api/recent_clicks', async (req, res) => {
+  app.get('/api/recent_clicks', cors(corsOptions), async (req, res) => {
     try {
       const limit = req.query && req.query.limit ? parseInt(req.query.limit, 10)  : 10;
       const businesses = await recentClicks({limit});
@@ -83,7 +97,7 @@ if (process.env.NODE_ENV === 'production') {
     }
   });
 
-  app.get('/api/top_clicks', async (req, res) => {
+  app.get('/api/top_clicks', cors(corsOptions), async (req, res) => {
     try {
       const limit = req.query && req.query.limit ? parseInt(req.query.limit, 10)  : 10;
       const lat = req.query && req.query.lat ? parseFloat(req.query.lat)  : undefined;
