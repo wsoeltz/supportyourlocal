@@ -6,6 +6,7 @@ import express from 'express';
 import expressGraphQL from 'express-graphql';
 import { redirectToHTTPS } from 'express-http-to-https';
 import mongoose from 'mongoose';
+import globalData from './api/globalData';
 import recentClicks from './api/recentClicks';
 import topClicks from './api/topClicks';
 import buildDataloaders from './dataloaders';
@@ -60,6 +61,16 @@ app.use('/graphql', expressGraphQL((req: any) => ({
 ///// End MongoDb Connection Setup
 
 if (process.env.NODE_ENV === 'production') {
+
+  app.get('/api/global_data', async (req, res) => {
+    try {
+      const data = await globalData();
+      res.json(data);
+    } catch (err) {
+      res.status(500);
+      res.send(err);
+    }
+  });
 
   app.get('/api/recent_clicks', async (req, res) => {
     try {
