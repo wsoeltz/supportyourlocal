@@ -734,6 +734,7 @@ const LandingPage = () => {
         </FooterContainer>
       </Root>
     </>
+
   );
 
 };
