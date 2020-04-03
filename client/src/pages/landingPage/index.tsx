@@ -1,5 +1,9 @@
 import { useQuery } from '@apollo/react-hooks';
 import {
+  faFacebookSquare,
+  faInstagram,
+} from '@fortawesome/free-brands-svg-icons';
+import {
   faBars,
   faMapMarkerAlt,
   faStreetView,
@@ -384,6 +388,11 @@ const FooterNavLink = styled(NavLink)`
 
   @media (max-width: ${mobileWidth}px) {
     font-size: 14px;
+    margin-right: 1rem;
+  }
+
+  @media (max-width: 345px) {
+    font-size: 12px;
   }
 `;
 
@@ -434,6 +443,20 @@ const FooterContainer = styled.div`
   background-color: ${primaryColor};
   box-shadow: 0px -2px 6px -2px rgba(0,0,0,0.2);
   position: relative;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const SocialIconsContainer = styled(NavLinks)`
+  margin-right: auto;
+  justify-content: flex-start;
+  margin-left: 1rem;
+`;
+
+const SocialNavLink = styled(FooterNavLink)`
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  border: none;
 `;
 
 const PopupGrid = styled.div`
@@ -841,6 +864,20 @@ const LandingPage = () => {
         </ContentContainer>
 
         <FooterContainer>
+          <SocialIconsContainer>
+            <SocialNavLink
+              href={'https://www.instagram.com/supportlocalde/'}
+              target='_blank'
+            >
+              <FontAwesomeIcon icon={faInstagram} />
+            </SocialNavLink>
+            <SocialNavLink
+              href={'https://www.facebook.com/supportlocalDE/'}
+              target='_blank'
+            >
+              <FontAwesomeIcon icon={faFacebookSquare} />
+            </SocialNavLink>
+          </SocialIconsContainer>
           <NavLinks>
             <FooterNavLink
               href={'https://www.supportyourlocal.online/presse'}
