@@ -8,6 +8,8 @@ navigation-links-favorite-places = Lieblingsorte
 navigation-links-for-shop-owners = Für Unternehmen
 navigation-links-about = Über uns
 
+heading-text-total-favorite-places = Lieblingsorte sind dabei
+
 navigation-links-press = Presse
 navigation-links-contact = Kontakt
 navigation-links-data-privacy = Datenschutz
@@ -25,3 +27,8 @@ ui-text-open-menu = Menü
 ui-text-menu-close = Schließen
 
 ui-text-loading = Lade Karte
+
+ui-text-shops-found = shops found in the current area.
+
+search-text-missing-shop = Missing a shop?
+search-text-tell-them-now = Tell them now to join the movement

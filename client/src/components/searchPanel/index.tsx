@@ -9,6 +9,7 @@ import sortBy from 'lodash/sortBy';
 import {rgba} from 'polished';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import styled from 'styled-components/macro';
+import {AppContext} from '../../App';
 import {
   AppLocalizationAndBundleContext,
 } from '../../contextProviders/getFluentLocalizationContext';
@@ -155,6 +156,25 @@ const PreviousButton = styled(PageButtonBase)`
   margin-right: auto;
 `;
 
+const Para = styled.p`
+  padding: 0 0.8rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: #666;
+
+  a {
+    color: ${primaryColor};
+  }
+
+  &:first-of-type {
+    margin-top: 0.7rem;
+  }
+
+  &:last-of-type {
+    margin-bottom: 0.7rem;
+  }
+`;
+
 const SEARCH_BUSINESSES = gql`
   query SearchBusinesses($selectionArray: [ID!]) {
     businesses: getBusinessesFromArray(selectionArray: $selectionArray) {
@@ -218,6 +238,8 @@ const SearchPanel = (props: Props) => {
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
+  const { windowWidth } = useContext(AppContext);
+
   const [pageNumber, setPageNumber] = useState<number>(1);
   const nPerPage = 25;
 
@@ -250,6 +272,16 @@ const SearchPanel = (props: Props) => {
 
   const dataToUse = loading === true ? prevData : data;
 
+  const missingShopPara = (
+    <Para>
+      <strong>{getFluentString('search-text-missing-shop')}</strong>
+      {' '}
+      <a href='https://www.supportyourlocal.online/fuer-unternehmen'>
+        {getFluentString('search-text-tell-them-now')}
+      </a>
+    </Para>
+  );
+
   let content: React.ReactElement<any> | null;
   if (error) {
     console.error(error);
@@ -267,10 +299,15 @@ const SearchPanel = (props: Props) => {
     });
     const noResultsFluentId = range > 500
       ? 'ui-text-out-out-range' : 'ui-text-no-results-for-location';
+    const missingShopParaElm = range > 500
+      ? null : missingShopPara;
     content = (
-      <NoResults>
-        <em>{getFluentString(noResultsFluentId)}</em>
-      </NoResults>
+      <>
+        <NoResults>
+          <em>{getFluentString(noResultsFluentId)}</em>
+          {missingShopParaElm}
+        </NoResults>
+      </>
     );
   } else {
 
@@ -354,8 +391,17 @@ const SearchPanel = (props: Props) => {
       <PreviousButton onClick={decPage}>‹ Previous</PreviousButton>
     ) : null;
 
+    const numberOfShops = coordinates.length && windowWidth > mobileWidth
+      ? (
+        <>
+          <Para>{`${coordinates.length} ${getFluentString('ui-text-shops-found')}`}</Para>
+          {missingShopPara}
+        </>
+      ) : null;
+
     content = (
       <ScrollContainer ref={resultsContainerElm}>
+        {numberOfShops}
         {cards}
         <PaginationContainer>
           {prevButton}

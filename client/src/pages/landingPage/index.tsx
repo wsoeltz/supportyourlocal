@@ -228,10 +228,16 @@ const LocationIcon = styled(FontAwesomeIcon)`
 
 const HeadingContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   background-color: ${primaryColor};
   box-shadow: 0px 3px 6px -2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 100;
+`;
+
+const HeadingLogoContainer = styled.div`
+  width: 250px;
+  position: relative;
 `;
 
 const HeadingLogo = styled.h1`
@@ -252,6 +258,54 @@ const HeadingLogo = styled.h1`
 const Hash = styled.span`
   color: #fff;
   margin-right: 0.3rem;
+`;
+
+const TotalPlacesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: ${mobileWidth}px) {
+    padding: 0 0.5rem;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 500px) {
+    display: none;
+  }
+`;
+
+const TotalValue = styled.div`
+  margin-top: 0.4rem;
+  margin-bottom: 0.2rem;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 1.4rem;
+  line-height: 1.8;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media(max-width: 990px) {
+    font-size: 1.15rem;
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    font-size: 1rem;
+    line-height: 1;
+    background-color: transparent;
+  }
+`;
+const TotalText = styled.p`
+  color: #fff;
+  font-size: 0.85rem;
+
+  @media(max-width: 990px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -292,7 +346,6 @@ const SearchAndResultsContainer = styled.div`
 `;
 
 const NavLinks = styled.nav`
-  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -300,7 +353,7 @@ const NavLinks = styled.nav`
   font-family: ${primaryFont};
 `;
 
-const mobileMenuScreenWidth = 730; // in px
+const mobileMenuScreenWidth = 900; // in px
 
 const NavLink = styled.a`
   margin-right: 1.5rem;
@@ -337,7 +390,6 @@ const NavLinkCurrent = styled(HeaderNavLink)`
 `;
 
 const MobileMenuButton = styled.button`
-  margin-left: auto;
   padding: 0 1rem;
   background-color: ${primaryColor};
   color: #fff;
@@ -653,6 +705,9 @@ const LandingPage = () => {
     );
   }
 
+  const totalPlacesCount = allBusiness && allBusiness.features.length
+    ? allBusiness.features.length : <LoaderSmall color={'#fff'} />;
+
   return (
     <>
       <Helmet>
@@ -664,12 +719,16 @@ const LandingPage = () => {
       </Helmet>
       <Root>
         <HeadingContainer>
-          <div>
+          <HeadingLogoContainer>
             <HeadingLogo>
               <Hash>#</Hash>
               {getFluentString('base-title-no-hash')}
             </HeadingLogo>
-          </div>
+          </HeadingLogoContainer>
+          <TotalPlacesContainer>
+            <TotalValue>{totalPlacesCount}</TotalValue>
+            <TotalText>{getFluentString('heading-text-total-favorite-places')}</TotalText>
+          </TotalPlacesContainer>
           {navigation}
         </HeadingContainer>
 
