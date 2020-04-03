@@ -93,7 +93,7 @@ const Info = styled.p`
   color: #435369;
 `;
 
-const NoResults = styled.p`
+const NoResults = styled.div`
   padding: 1rem;
   text-align: center;
   color: #666;

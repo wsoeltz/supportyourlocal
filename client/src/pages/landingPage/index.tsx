@@ -17,6 +17,7 @@ import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
 import LoaderSmall from '../../components/general/LoaderSmall';
+import Popup from '../../components/general/Popup';
 import Map, {Coordinate, MapBounds} from '../../components/map';
 import SearchPanel, {mobileWidth} from '../../components/searchPanel';
 import {
@@ -34,6 +35,7 @@ import {
   secondaryFont,
 } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
+import HeartImageSVGUrl from './heart-image.svg';
 import { transformAllData } from './Utils';
 
 const primaryBackgroundColor = '#f3f3f3';
@@ -434,6 +436,46 @@ const FooterContainer = styled.div`
   position: relative;
 `;
 
+const PopupGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  @media (max-width: 440px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-row-gap: 3rem;
+  }
+`;
+
+const PopupTitle = styled.h2`
+  margin-top: 0;
+`;
+
+const PopupImg = styled.img`
+  width: 180px;
+  margin: auto;
+`;
+
+const PopupButton = styled.a`
+  padding: 0.3rem 0.4rem;
+  background-color: ${secondaryColor};
+  border: solid 2px ${secondaryColor};
+  color: ${primaryColor};
+  text-decoration: none;
+  text-align: center;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: transparent;
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    white-space: nowrap;
+    width: 100%;
+    height: 2rem;
+  }
+`;
+
 const GET_ALL_BUSINESS = gql`
   query AllBusinesses {
     businesses {
@@ -445,6 +487,8 @@ const GET_ALL_BUSINESS = gql`
     }
   }
 `;
+
+const localStoragePopupHasBeenDismissed = 'localStoragePopupHasBeenDismissed';
 
 interface AllBusinessesSuccess {
   businesses: Array<{
@@ -470,6 +514,9 @@ const LandingPage = () => {
 
   const { lat, lng, tooltipId } = queryString.parse(window.location.search);
   const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
+
+  const initialPopupState = localStorage.getItem(localStoragePopupHasBeenDismissed);
+  const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
 
   const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
@@ -708,6 +755,31 @@ const LandingPage = () => {
   const totalPlacesCount = allBusiness && allBusiness.features.length
     ? allBusiness.features.length : <LoaderSmall color={'#fff'} />;
 
+  const dismissPopup = () => {
+    localStorage.setItem(localStoragePopupHasBeenDismissed, 'true');
+    setIsPopupShown(false);
+  };
+  const popup = isPopupShown ? (
+    <Popup top={0} right={0} width={580} onDismiss={dismissPopup}>
+      <PopupGrid>
+        <div>
+          <PopupTitle>{getFluentString('popup-text-title')}</PopupTitle>
+          <p>
+            {getFluentString('popup-text-para-1')}
+          </p>
+          <p>
+            {getFluentString('popup-text-para-2')}
+          </p>
+          <br />
+          <PopupButton href='https://www.supportyourlocal.online/' >
+            {getFluentString('popup-button-text')}
+          </PopupButton>
+        </div>
+        <PopupImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
+      </PopupGrid>
+    </Popup>
+  ) : null;
+
   return (
     <>
       <Helmet>
@@ -733,7 +805,6 @@ const LandingPage = () => {
         </HeadingContainer>
 
         <ContentContainer>
-
           <Map
             coordinates={coordinates}
             getMapBounds={getMapBounds}
@@ -764,6 +835,8 @@ const LandingPage = () => {
               highlighted={highlighted}
             />
           </SearchAndResultsContainer>
+
+          {popup}
 
         </ContentContainer>
 
