@@ -503,6 +503,12 @@ const PopupButtonSmall = styled(PopupButton)`
   font-size: 0.8rem;
   text-transform: uppercase;
   margin-bottom: 1rem;
+
+  @media (max-width: ${mobileWidth}px) {
+    white-space: normal;
+    width: auto;
+    height: auto;
+  }
 `;
 
 const DisclaimerButtons = styled.div`
@@ -512,6 +518,7 @@ const DisclaimerButtons = styled.div`
 `;
 
 const DissmissButton = styled.button`
+  background-color: transparent;
 `;
 
 const GET_ALL_BUSINESS = gql`

@@ -28,6 +28,7 @@ const DismissButton = styled.button`
   padding: 0.5rem;
   box-sizing: border-box;
   border-radius: ${borderRadius}px;
+  background-color: transparent;
 `;
 
 interface Props {
