@@ -8,6 +8,8 @@ navigation-links-favorite-places = Lieblingsorte
 navigation-links-for-shop-owners = Für Unternehmen
 navigation-links-about = Über uns
 
+heading-text-total-favorite-places = Lieblingsorte sind dabei
+
 navigation-links-press = Presse
 navigation-links-contact = Kontakt
 navigation-links-data-privacy = Datenschutz
@@ -25,3 +27,17 @@ ui-text-open-menu = Menü
 ui-text-menu-close = Schließen
 
 ui-text-loading = Lade Karte
+
+ui-text-shops-found = shops found in the current area.
+
+search-text-missing-shop = Missing a shop?
+search-text-tell-them-now = Tell them now to join the movement
+
+popup-text-title = Together we are strong
+popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
+popup-text-para-2 = #supportyourlocal is a non-profit initiative supporting that.
+popup-button-text = Learn More
+
+disclaimer-popup-text = Es besteht das Risiko, dass ein Geschäft einen Insolvenzantrag stellen muss und eine Einlösung und/oder eine Rückzahlung eines gekauften Gutscheins nicht erfolgen wird. #supportyourlocal schliesst jegliche Haftung aus.
+disclaimer-popup-more = mehr
+disclaimer-popup-dismiss = Nicht mehr anzeigen

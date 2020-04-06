@@ -1,5 +1,9 @@
 import { useQuery } from '@apollo/react-hooks';
 import {
+  faFacebookSquare,
+  faInstagram,
+} from '@fortawesome/free-brands-svg-icons';
+import {
   faBars,
   faMapMarkerAlt,
   faStreetView,
@@ -17,6 +21,7 @@ import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
 import LoaderSmall from '../../components/general/LoaderSmall';
+import Popup from '../../components/general/Popup';
 import Map, {Coordinate, MapBounds} from '../../components/map';
 import SearchPanel, {mobileWidth} from '../../components/searchPanel';
 import {
@@ -34,6 +39,7 @@ import {
   secondaryFont,
 } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
+import HeartImageSVGUrl from './heart-image.svg';
 import { transformAllData } from './Utils';
 
 const primaryBackgroundColor = '#f3f3f3';
@@ -228,10 +234,16 @@ const LocationIcon = styled(FontAwesomeIcon)`
 
 const HeadingContainer = styled.div`
   display: flex;
+  justify-content: space-between;
   background-color: ${primaryColor};
   box-shadow: 0px 3px 6px -2px rgba(0,0,0,0.2);
   position: relative;
   z-index: 100;
+`;
+
+const HeadingLogoContainer = styled.div`
+  width: 250px;
+  position: relative;
 `;
 
 const HeadingLogo = styled.h1`
@@ -252,6 +264,54 @@ const HeadingLogo = styled.h1`
 const Hash = styled.span`
   color: #fff;
   margin-right: 0.3rem;
+`;
+
+const TotalPlacesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: ${mobileWidth}px) {
+    padding: 0 0.5rem;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  @media (max-width: 500px) {
+    display: none;
+  }
+`;
+
+const TotalValue = styled.div`
+  margin-top: 0.4rem;
+  margin-bottom: 0.2rem;
+  border-radius: 7px;
+  background-color: rgba(0, 0, 0, 0.5);
+  font-size: 1.4rem;
+  line-height: 1.8;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media(max-width: 990px) {
+    font-size: 1.15rem;
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    font-size: 1rem;
+    line-height: 1;
+    background-color: transparent;
+  }
+`;
+const TotalText = styled.p`
+  color: #fff;
+  font-size: 0.85rem;
+
+  @media(max-width: 990px) {
+    font-size: 0.8rem;
+  }
 `;
 
 const ContentContainer = styled.div`
@@ -292,7 +352,6 @@ const SearchAndResultsContainer = styled.div`
 `;
 
 const NavLinks = styled.nav`
-  flex-grow: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -300,7 +359,7 @@ const NavLinks = styled.nav`
   font-family: ${primaryFont};
 `;
 
-const mobileMenuScreenWidth = 730; // in px
+const mobileMenuScreenWidth = 900; // in px
 
 const NavLink = styled.a`
   margin-right: 1.5rem;
@@ -329,6 +388,11 @@ const FooterNavLink = styled(NavLink)`
 
   @media (max-width: ${mobileWidth}px) {
     font-size: 14px;
+    margin-right: 1rem;
+  }
+
+  @media (max-width: 345px) {
+    font-size: 12px;
   }
 `;
 
@@ -337,7 +401,6 @@ const NavLinkCurrent = styled(HeaderNavLink)`
 `;
 
 const MobileMenuButton = styled.button`
-  margin-left: auto;
   padding: 0 1rem;
   background-color: ${primaryColor};
   color: #fff;
@@ -380,6 +443,82 @@ const FooterContainer = styled.div`
   background-color: ${primaryColor};
   box-shadow: 0px -2px 6px -2px rgba(0,0,0,0.2);
   position: relative;
+  display: flex;
+  justify-content: space-between;
+`;
+
+const SocialIconsContainer = styled(NavLinks)`
+  margin-right: auto;
+  justify-content: flex-start;
+  margin-left: 1rem;
+`;
+
+const SocialNavLink = styled(FooterNavLink)`
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  border: none;
+`;
+
+const PopupGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr auto;
+
+  @media (max-width: 440px) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    grid-row-gap: 3rem;
+  }
+`;
+
+const PopupTitle = styled.h2`
+  margin-top: 0;
+`;
+
+const PopupImg = styled.img`
+  width: 180px;
+  margin: auto;
+`;
+
+const PopupButton = styled.a`
+  padding: 0.3rem 0.4rem;
+  background-color: ${secondaryColor};
+  border: solid 2px ${secondaryColor};
+  color: ${primaryColor};
+  text-decoration: none;
+  text-align: center;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: transparent;
+  }
+
+  @media (max-width: ${mobileWidth}px) {
+    white-space: nowrap;
+    width: 100%;
+    height: 2rem;
+  }
+`;
+
+const PopupButtonSmall = styled(PopupButton)`
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+
+  @media (max-width: ${mobileWidth}px) {
+    white-space: normal;
+    width: auto;
+    height: auto;
+  }
+`;
+
+const DisclaimerButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const DissmissButton = styled.button`
+  background-color: transparent;
 `;
 
 const GET_ALL_BUSINESS = gql`
@@ -393,6 +532,9 @@ const GET_ALL_BUSINESS = gql`
     }
   }
 `;
+
+const localStoragePopupHasBeenDismissed = 'localStoragePopupHasBeenDismissed';
+const localStorageDisclaimerHasBeenDismissed = 'localStorageDisclaimerHasBeenDismissed';
 
 interface AllBusinessesSuccess {
   businesses: Array<{
@@ -418,6 +560,11 @@ const LandingPage = () => {
 
   const { lat, lng, tooltipId } = queryString.parse(window.location.search);
   const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
+
+  const initialPopupState = localStorage.getItem(localStoragePopupHasBeenDismissed);
+  const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
+  const initialDisclaimerState = localStorage.getItem(localStorageDisclaimerHasBeenDismissed);
+  const [isDisclaimerShown, setIsDisclaimerShown] = useState<boolean>(!initialDisclaimerState);
 
   const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
@@ -653,6 +800,62 @@ const LandingPage = () => {
     );
   }
 
+  const totalPlacesCount = allBusiness && allBusiness.features.length
+    ? allBusiness.features.length : <LoaderSmall color={'#fff'} />;
+
+  const dismissPopup = () => {
+    localStorage.setItem(localStoragePopupHasBeenDismissed, 'true');
+    setIsPopupShown(false);
+  };
+
+  const disablePopup = true;
+
+  const popup = isPopupShown && !disablePopup ? (
+    <Popup top={0} right={0} width={580} onDismiss={dismissPopup}>
+      <PopupGrid>
+        <div>
+          <PopupTitle>{getFluentString('popup-text-title')}</PopupTitle>
+          <p>
+            {getFluentString('popup-text-para-1')}
+          </p>
+          <p>
+            {getFluentString('popup-text-para-2')}
+          </p>
+          <br />
+          <PopupButton href='https://www.supportyourlocal.online/' >
+            {getFluentString('popup-button-text')}
+          </PopupButton>
+        </div>
+        <PopupImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
+      </PopupGrid>
+    </Popup>
+  ) : null;
+
+  const dismissDisclaimer = () => {
+    setIsDisclaimerShown(false);
+  };
+  const dismissDisclaimerPermeneantly = () => {
+    localStorage.setItem(localStorageDisclaimerHasBeenDismissed, 'true');
+    setIsDisclaimerShown(false);
+  };
+  const disclaimer = isDisclaimerShown ? (
+    <Popup bottom={0} right={0} width={300} onDismiss={dismissDisclaimer}>
+      <p>
+        <small>
+          {getFluentString('disclaimer-popup-text')}
+        </small>
+      </p>
+      <DisclaimerButtons>
+        <PopupButtonSmall href={'https://www.supportyourlocal.online/disclaimer'}>
+          {getFluentString('disclaimer-popup-more')}
+        </PopupButtonSmall>
+        <DissmissButton onClick={dismissDisclaimerPermeneantly}>
+          {getFluentString('disclaimer-popup-dismiss')}
+        </DissmissButton>
+      </DisclaimerButtons>
+    </Popup>
+  ) : null;
+
   return (
     <>
       <Helmet>
@@ -664,17 +867,20 @@ const LandingPage = () => {
       </Helmet>
       <Root>
         <HeadingContainer>
-          <div>
+          <HeadingLogoContainer>
             <HeadingLogo>
               <Hash>#</Hash>
               {getFluentString('base-title-no-hash')}
             </HeadingLogo>
-          </div>
+          </HeadingLogoContainer>
+          <TotalPlacesContainer>
+            <TotalValue>{totalPlacesCount}</TotalValue>
+            <TotalText>{getFluentString('heading-text-total-favorite-places')}</TotalText>
+          </TotalPlacesContainer>
           {navigation}
         </HeadingContainer>
 
         <ContentContainer>
-
           <Map
             coordinates={coordinates}
             getMapBounds={getMapBounds}
@@ -706,9 +912,26 @@ const LandingPage = () => {
             />
           </SearchAndResultsContainer>
 
+          {popup}
+          {disclaimer}
+
         </ContentContainer>
 
         <FooterContainer>
+          <SocialIconsContainer>
+            <SocialNavLink
+              href={'https://www.instagram.com/supportlocalde/'}
+              target='_blank'
+            >
+              <FontAwesomeIcon icon={faInstagram} />
+            </SocialNavLink>
+            <SocialNavLink
+              href={'https://www.facebook.com/supportlocalDE/'}
+              target='_blank'
+            >
+              <FontAwesomeIcon icon={faFacebookSquare} />
+            </SocialNavLink>
+          </SocialIconsContainer>
           <NavLinks>
             <FooterNavLink
               href={'https://www.supportyourlocal.online/presse'}
@@ -734,6 +957,7 @@ const LandingPage = () => {
         </FooterContainer>
       </Root>
     </>
+
   );
 
 };

@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@apollo/react-hooks": "^3.0.0",
+    "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@mapbox/mapbox-gl-geocoder": "^4.5.1",
     "@types/body-parser": "^1.17.0",
     "@types/cors": "^2.8.5",
