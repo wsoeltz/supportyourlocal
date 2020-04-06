@@ -499,6 +499,21 @@ const PopupButton = styled.a`
   }
 `;
 
+const PopupButtonSmall = styled(PopupButton)`
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+`;
+
+const DisclaimerButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const DissmissButton = styled.button`
+`;
+
 const GET_ALL_BUSINESS = gql`
   query AllBusinesses {
     businesses {
@@ -512,6 +527,7 @@ const GET_ALL_BUSINESS = gql`
 `;
 
 const localStoragePopupHasBeenDismissed = 'localStoragePopupHasBeenDismissed';
+const localStorageDisclaimerHasBeenDismissed = 'localStorageDisclaimerHasBeenDismissed';
 
 interface AllBusinessesSuccess {
   businesses: Array<{
@@ -540,6 +556,8 @@ const LandingPage = () => {
 
   const initialPopupState = localStorage.getItem(localStoragePopupHasBeenDismissed);
   const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
+  const initialDisclaimerState = localStorage.getItem(localStorageDisclaimerHasBeenDismissed);
+  const [isDisclaimerShown, setIsDisclaimerShown] = useState<boolean>(!initialDisclaimerState);
 
   const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
@@ -782,7 +800,10 @@ const LandingPage = () => {
     localStorage.setItem(localStoragePopupHasBeenDismissed, 'true');
     setIsPopupShown(false);
   };
-  const popup = isPopupShown ? (
+
+  const disablePopup = true;
+
+  const popup = isPopupShown && !disablePopup ? (
     <Popup top={0} right={0} width={580} onDismiss={dismissPopup}>
       <PopupGrid>
         <div>
@@ -800,6 +821,31 @@ const LandingPage = () => {
         </div>
         <PopupImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
       </PopupGrid>
+    </Popup>
+  ) : null;
+
+  const dismissDisclaimer = () => {
+    setIsDisclaimerShown(false);
+  };
+  const dismissDisclaimerPermeneantly = () => {
+    localStorage.setItem(localStorageDisclaimerHasBeenDismissed, 'true');
+    setIsDisclaimerShown(false);
+  };
+  const disclaimer = isDisclaimerShown ? (
+    <Popup bottom={0} right={0} width={300} onDismiss={dismissDisclaimer}>
+      <p>
+        <small>
+          {getFluentString('disclaimer-popup-text')}
+        </small>
+      </p>
+      <DisclaimerButtons>
+        <PopupButtonSmall href={'https://www.supportyourlocal.online/disclaimer'}>
+          {getFluentString('disclaimer-popup-more')}
+        </PopupButtonSmall>
+        <DissmissButton onClick={dismissDisclaimerPermeneantly}>
+          {getFluentString('disclaimer-popup-dismiss')}
+        </DissmissButton>
+      </DisclaimerButtons>
     </Popup>
   ) : null;
 
@@ -860,6 +906,7 @@ const LandingPage = () => {
           </SearchAndResultsContainer>
 
           {popup}
+          {disclaimer}
 
         </ContentContainer>
 

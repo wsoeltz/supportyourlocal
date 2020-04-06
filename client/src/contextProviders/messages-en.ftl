@@ -37,3 +37,7 @@ popup-text-title = Together we are strong
 popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
 popup-text-para-2 = #supportyourlocal is a non-profit initiative supporting that.
 popup-button-text = Learn More
+
+disclaimer-popup-text = There is a risk that a business will have to file for bankruptcy and that a purchased voucher will not be redeemed and / or repaid.
+disclaimer-popup-more = more
+disclaimer-popup-dismiss = Don't show me this again
