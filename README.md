@@ -8,9 +8,20 @@ If you would like to get involved, please contact us at hello@supportyourlocal.o
 
 Live website - https://www.search.supportyourlocal.online/
 
+## Table of Contents
+  - [Contributing](#contributing)
+    - [Getting Started](#gettingstarted)
+    - [Adding In Test Data To Your Database](#addingintestdata)
+    - [Creating Commits and Pulls Requests](#commitsandpullrequests)
+  - [Our Technology Stack Hooks](#techstack)
+
+<a name="contributing"/>
+
 ## Contributing
 
 Please follow the guidelines below for getting started and making commits.
+
+<a name="gettingstarted"/>
 
 ### Getting started
 
@@ -43,6 +54,8 @@ Please follow the guidelines below for getting started and making commits.
 
 11. With your environment variables setup, naviagate to the root directory and run `npm run dev`. The project should be running at [http://localhost:3000/](http://localhost:3000/)
 
+<a name="addingintestdata"/>
+
 #### Adding In Test Data To Your Database
 
 In order to properly work on this project, you will need some data to work with. Follow these steps to get setup with some test data to get started -
@@ -53,6 +66,8 @@ In order to properly work on this project, you will need some data to work with.
 4. Wait a couple of minutes. A proper success screen has not been implemented for this tool, so let it run without clicking anything on the window.
 5. The data should eventually show up on the page. If it does not, check the console for errors and/or try refreshing the page. An environment variable may be setup incorrectly.
 
+<a name="commitsandpullrequests"/>
+
 ### Creating Commits and Pulls Requests
 
 When contributing please follow the below rules:
@@ -60,6 +75,8 @@ When contributing please follow the below rules:
 - Always work off of feature branches that branch off from the `develop` branch
 - Before committing your code, run `npm run lint:fix` to make sure your code is formatted to the same standards as the rest of the project
 - Make pull-requests from your feature branch into the `develop` branch. Once your contribution has been tested in the staging environment (visible at https://supportyourlocal-dev.herokuapp.com/) we will merge it into the master/production.
+
+<a name="techstack"/>
 
 ## Our Technology Stack
 
