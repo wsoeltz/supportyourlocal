@@ -95,7 +95,6 @@ const Info = styled.p`
 
 const NoResults = styled.div`
   padding: 1rem;
-  text-align: center;
   color: #666;
 `;
 
@@ -161,6 +160,7 @@ const Para = styled.p`
   margin: 0;
   font-size: 0.85rem;
   color: #666;
+  text-align: left;
 
   a {
     color: ${primaryColor};
@@ -273,13 +273,9 @@ const SearchPanel = (props: Props) => {
   const dataToUse = loading === true ? prevData : data;
 
   const missingShopPara = (
-    <Para>
-      <strong>{getFluentString('search-text-missing-shop')}</strong>
-      {' '}
-      <a href='https://www.supportyourlocal.online/fuer-unternehmen'>
-        {getFluentString('search-text-tell-them-now')}
-      </a>
-    </Para>
+    <Para
+      dangerouslySetInnerHTML={{__html: getFluentString('search-text-missing-shop')}}
+    />
   );
 
   let content: React.ReactElement<any> | null;
@@ -300,13 +296,17 @@ const SearchPanel = (props: Props) => {
     const noResultsFluentId = range > 500
       ? 'ui-text-out-out-range' : 'ui-text-no-results-for-location';
     const missingShopParaElm = range > 500
-      ? null : missingShopPara;
+      ? null : (
+        <Para
+          dangerouslySetInnerHTML={{__html: getFluentString('search-text-no-results-donate')}}
+        />
+      );
     content = (
       <>
         <NoResults>
           <em>{getFluentString(noResultsFluentId)}</em>
-          {missingShopParaElm}
         </NoResults>
+        {missingShopParaElm}
       </>
     );
   } else {
@@ -394,7 +394,7 @@ const SearchPanel = (props: Props) => {
     const numberOfShops = coordinates.length && windowWidth > mobileWidth
       ? (
         <>
-          <Para>{`${coordinates.length} ${getFluentString('ui-text-shops-found')}`}</Para>
+          <Para><strong>{coordinates.length}</strong> {getFluentString('ui-text-shops-found')}</Para>
           {missingShopPara}
         </>
       ) : null;
