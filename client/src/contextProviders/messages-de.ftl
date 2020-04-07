@@ -28,10 +28,11 @@ ui-text-menu-close = Schließen
 
 ui-text-loading = Lade Karte
 
-ui-text-shops-found = shops found in the current area.
+ui-text-shops-found = shops im aktuellen Ausschnitt gefunden
 
-search-text-missing-shop = Missing a shop?
-search-text-tell-them-now = Tell them now to join the movement
+search-text-missing-shop = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a> kannst Du auch viele betroffenen Geschäfte mit einer Spende unterstützen
+
+search-text-no-results-donate = Leider konnten wir hier (noch) keinen Lieblingsort finden. Warum unterstützt Du nicht auf <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a> alle betroffenen Geschäfte mit einer Spende?
 
 popup-text-title = Together we are strong
 popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.

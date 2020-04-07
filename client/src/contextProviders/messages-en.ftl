@@ -30,8 +30,9 @@ ui-text-loading = Loading
 
 ui-text-shops-found = shops found in the current area.
 
-search-text-missing-shop = Missing a shop?
-search-text-tell-them-now = Tell them now to join the movement
+search-text-missing-shop = <strong>Tip:</strong> On <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a> you can also support many affected businesses with a donation
+
+search-text-no-results-donate = Unfortunately we could not find a favorite place here (yet). Why don't you support all affected businesses with a donation on <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a>?
 
 popup-text-title = Together we are strong
 popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
