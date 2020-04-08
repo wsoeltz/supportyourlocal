@@ -90,6 +90,7 @@ interface Props {
   loading: boolean;
   geocoderSearchElm: HTMLElement | null;
   customData: CustomGeoJson | undefined;
+  onLinkClick: (value: Coordinate & {name: string}) => void;
 }
 
 interface MapUtilProps {
@@ -333,7 +334,7 @@ const Map = (props: Props) => {
   const {
     coordinates, highlighted, getMapBounds,
     initialCenter, loading, geocoderSearchElm,
-    customData, setHighlighted,
+    customData, setHighlighted, onLinkClick,
   } = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
@@ -399,6 +400,7 @@ const Map = (props: Props) => {
     popup = (
       <StyledPopup {...popupInfo}
         getFluentString={getFluentString}
+        onLinkClick={onLinkClick}
         closePopup={() => setPopupInfo(null)}
       />
     );

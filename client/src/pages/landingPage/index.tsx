@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/react-hooks';
 import {
   faFacebookSquare,
   faInstagram,
+  faTwitterSquare,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBars,
@@ -14,13 +15,14 @@ import { GetString } from 'fluent-react/compat';
 import gql from 'graphql-tag';
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
-import {darken} from 'polished';
+import {darken, lighten} from 'polished';
 import queryString from 'query-string';
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import Helmet from 'react-helmet';
 import styled, {keyframes} from 'styled-components/macro';
 import { AppContext } from '../../App';
 import LoaderSmall from '../../components/general/LoaderSmall';
+import Modal from '../../components/general/Modal';
 import Popup from '../../components/general/Popup';
 import Map, {Coordinate, MapBounds} from '../../components/map';
 import SearchPanel, {mobileWidth} from '../../components/searchPanel';
@@ -521,6 +523,54 @@ const DissmissButton = styled.button`
   background-color: transparent;
 `;
 
+const ShareContent = styled.div`
+  padding: 1rem 1rem 0;
+`;
+const ShareButtons = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
+
+const ShareButtonBase = styled.button`
+  font-size: 0.9rem;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+`;
+
+const FacebookShareButton = styled(ShareButtonBase)`
+  background-color: #3b5998;
+  border-bottom-left-radius: ${borderRadius}px;
+
+  &:hover {
+    background-color: ${lighten(0.1, '#3b5998')};
+  }
+`;
+const TwitterShareButton = styled(ShareButtonBase)`
+  background-color: #1DA1F2;
+  border-bottom-right-radius: ${borderRadius}px;
+
+  &:hover {
+    background-color: ${lighten(0.1, '#1DA1F2')};
+  }
+`;
+const ThanksModalText = styled.p`
+  font-size: 1.1rem;
+  text-align: center;
+  color: ${primaryColor};
+  margin: 1rem 0 2rem;
+`;
+const ShareIcon = styled(FontAwesomeIcon)`
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+`;
+const ShareImg = styled.img`
+  width: 180px;
+  margin: auto;
+  display: block;
+`;
 const GET_ALL_BUSINESS = gql`
   query AllBusinesses {
     businesses {
@@ -546,6 +596,10 @@ interface AllBusinessesSuccess {
   }>;
 }
 
+interface BusinessDatum extends Coordinate {
+  name: Business['name'];
+}
+
 interface WinodwQuery {
   lat: string | undefined;
   lng: string | undefined;
@@ -565,6 +619,7 @@ const LandingPage = () => {
   const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
   const initialDisclaimerState = localStorage.getItem(localStorageDisclaimerHasBeenDismissed);
   const [isDisclaimerShown, setIsDisclaimerShown] = useState<boolean>(!initialDisclaimerState);
+  const [clickedInfo, setClickedInfo] = useState<BusinessDatum | undefined>(undefined);
 
   const {loading, error, data: allData} = useQuery<AllBusinessesSuccess>(GET_ALL_BUSINESS);
   const allBusiness = allData && allData.businesses ? transformAllData(allData.businesses) : undefined;
@@ -856,6 +911,52 @@ const LandingPage = () => {
     </Popup>
   ) : null;
 
+  const facebookShare = () => {
+    window.open(
+        'https://www.facebook.com/sharer/sharer.php?u=https://www.supportyourlocal.online/',
+        'facebook-share-dialog',
+        'width=626,height=436',
+    );
+  };
+  const twitterShare = () => {
+    window.open(
+        'http://www.twitter.com/share?text=' +
+          getFluentString('twitter-placeholder-text') + ' %23supportyourlocal' +
+          '&url=https://www.supportyourlocal.online/',
+        'twitter-share-dialog',
+        'width=626,height=436',
+    );
+  };
+
+  const shareModal = clickedInfo === undefined ? null : (
+    <Modal
+      onClose={() => setClickedInfo(undefined)}
+      width={'400px'}
+      height={'auto'}
+      padding={0}
+      actions={null}
+    >
+      <ShareContent>
+        <ShareImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
+        <ThanksModalText
+          dangerouslySetInnerHTML={
+            {__html: getFluentString('thanks-for-supporting', {'business-name': clickedInfo.name})}
+          }
+        />
+      </ShareContent>
+      <ShareButtons>
+        <FacebookShareButton onClick={facebookShare}>
+          <ShareIcon icon={faFacebookSquare} />
+          {getFluentString('share-on-facebook')}
+        </FacebookShareButton>
+        <TwitterShareButton onClick={twitterShare}>
+          <ShareIcon icon={faTwitterSquare} />
+          {getFluentString('share-on-twitter')}
+        </TwitterShareButton>
+      </ShareButtons>
+    </Modal>
+  );
+
   return (
     <>
       <Helmet>
@@ -891,6 +992,7 @@ const LandingPage = () => {
             geocoderSearchElm={geocoderSearchElm}
             customData={allBusiness}
             setHighlighted={setHighlighted}
+            onLinkClick={setClickedInfo}
             key={'main-map'}
           />
 
@@ -909,6 +1011,7 @@ const LandingPage = () => {
               mapBounds={preciseMapBounds}
               coordinates={coordinates}
               highlighted={highlighted}
+              onLinkClick={setClickedInfo}
             />
           </SearchAndResultsContainer>
 
@@ -956,6 +1059,7 @@ const LandingPage = () => {
           </NavLinks>
         </FooterContainer>
       </Root>
+      {shareModal}
     </>
 
   );

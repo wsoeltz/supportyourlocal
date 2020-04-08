@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faFacebookSquare,
   faInstagram,
+  faTwitterSquare,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBars,
@@ -22,7 +23,7 @@ import {
 // Add all font awesome icons here
 library.add(
   faSearch, faMapMarkerAlt, faStreetView, faMapMarker, faBars, faTimes,
-  faFacebookSquare, faInstagram,
+  faFacebookSquare, faInstagram, faTwitterSquare,
 );
 
 const GlobalStyles = createGlobalStyle`

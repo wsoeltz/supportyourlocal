@@ -30,9 +30,9 @@ ui-text-loading = Lade Karte
 
 ui-text-shops-found = shops im aktuellen Ausschnitt gefunden
 
-search-text-missing-shop = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a> kannst Du auch viele betroffenen Geschäfte mit einer Spende unterstützen
+search-text-missing-shop = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank" data-clickout="kaufnebenan">kaufnebenan.de</a> kannst Du auch viele betroffenen Geschäfte mit einer Spende unterstützen
 
-search-text-no-results-donate = Leider konnten wir hier (noch) keinen Lieblingsort finden. Warum unterstützt Du nicht auf <a href="https://www.kaufnebenan.de/donations" target="_blank">kaufnebenan.de</a> alle betroffenen Geschäfte mit einer Spende?
+search-text-no-results-donate = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank" data-clickout="kaufnebenan">kaufnebenan.de</a> kannst Du auch Gutscheine für Geschäfte kaufen, die noch keinen Gutschein-Shop haben!
 
 popup-text-title = Together we are strong
 popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
@@ -42,3 +42,10 @@ popup-button-text = Learn More
 disclaimer-popup-text = Es besteht das Risiko, dass ein Geschäft einen Insolvenzantrag stellen muss und eine Einlösung und/oder eine Rückzahlung eines gekauften Gutscheins nicht erfolgen wird. #supportyourlocal schliesst jegliche Haftung aus.
 disclaimer-popup-more = mehr
 disclaimer-popup-dismiss = Nicht mehr anzeigen
+
+twitter-placeholder-text = Support your local businesses during the COVID-19 pandemic.
+
+share-on-facebook = Share on Facebook
+share-on-twitter = Share on Twitter
+
+thanks-for-supporting = Thanks for supporting <strong>{ $business-name }</strong> - spread the word and ask friends to support as well!
