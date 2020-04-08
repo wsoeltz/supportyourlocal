@@ -15,7 +15,9 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import styled from 'styled-components/macro';
 import Loading from './components/general/Loading';
+import {overlayPortalContainerId} from './components/general/Modal';
 import {
   appLocalizationAndBundle as fluentValue,
   AppLocalizationAndBundleContext as FluentText,
@@ -24,6 +26,13 @@ import { Routes } from './routing/routes';
 import './styling/fonts/fonts.css';
 import GlobalStyles from './styling/GlobalStyles';
 import { Root } from './styling/Grid';
+
+const overlayPortalZIndex = 3000;
+
+const OverlayPortal = styled.div`
+  position: relative;
+  z-index: ${overlayPortalZIndex};
+`;
 
 const LandingPage = lazy(() => import('./pages/landingPage'));
 const FirstVoucherDataDownload = lazy(() => import('./pages/tools/FirstVoucherDataDownload'));
@@ -119,6 +128,7 @@ function App() {
                     <Route component={LandingPage} />
                   </Switch>
                 </Suspense>
+                <OverlayPortal id={overlayPortalContainerId} />
               </Root>
             </Router>
           </ApolloProvider>

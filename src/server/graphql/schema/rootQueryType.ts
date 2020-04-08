@@ -23,6 +23,12 @@ interface SearchInput {
 const RootQuery = new GraphQLObjectType({
   name: 'RootQueryType',
   fields: () => ({
+    totalBusinesses: {
+      type: GraphQLInt,
+      resolve() {
+        return Business.countDocuments({});
+      },
+    },
     businesses: {
       type: new GraphQLList(BusinessType),
       resolve() {

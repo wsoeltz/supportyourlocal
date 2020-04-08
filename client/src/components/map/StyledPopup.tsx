@@ -14,6 +14,7 @@ import {
   semiBoldFontBoldWeight,
 } from '../../styling/styleUtils';
 import LoaderSmall from '../general/LoaderSmall';
+import {Coordinate} from './index';
 
 const Root = styled.div`
   text-align: center;
@@ -112,19 +113,19 @@ interface Props {
   latitude: number;
   getFluentString: GetString;
   closePopup: () => void;
+  onLinkClick: (value: Coordinate & {name: string}) => void;
 }
 
 const StyledPopup = (props: Props) => {
   const {
     id, getFluentString, closePopup,
-    longitude, latitude,
+    longitude, latitude, onLinkClick,
   } = props;
 
   const {loading, error, data} = useQuery<SuccessResponse, Variables>(FIND_BUSINESS, {
     variables: {id},
   });
   const [updateClickHistory] = useMutation<ClickHistorySuccess, Variables>(UPDATE_CLICK_HISTORY);
-  const onClick = () => updateClickHistory({variables: {id}});
 
   let output: React.ReactElement<any> | null;
   if (loading) {
@@ -148,6 +149,10 @@ const StyledPopup = (props: Props) => {
     } else {
       logoImg = null;
     }
+    const onClick = () => {
+      onLinkClick({id, name, latitude, longitude});
+      updateClickHistory({variables: {id}});
+    };
     const websiteLink = website
       ? (
           <LinkButton

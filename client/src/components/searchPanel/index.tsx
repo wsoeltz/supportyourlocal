@@ -230,10 +230,11 @@ interface Props {
   mapBounds: MapBounds;
   coordinates: Coordinate[];
   highlighted: [Coordinate] | undefined;
+  onLinkClick: (value: Coordinate & {name: string}) => void;
 }
 
 const SearchPanel = (props: Props) => {
-  const {setHighlighted, mapBounds, coordinates, highlighted} = props;
+  const {setHighlighted, mapBounds, coordinates, highlighted, onLinkClick} = props;
 
   const {localization} = useContext(AppLocalizationAndBundleContext);
   const getFluentString: GetString = (...args) => localization.getString(...args);
@@ -326,7 +327,10 @@ const SearchPanel = (props: Props) => {
         name, address, website,
         secondaryUrl, industry,
       } = d;
-      const onClick = () => updateClickHistory({variables: {id: d.id}});
+      const onClick = () => {
+        onLinkClick(d);
+        updateClickHistory({variables: {id: d.id}});
+      };
       const websiteLink = website
         ? (
             <LinkButton
