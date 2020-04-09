@@ -43,9 +43,10 @@ disclaimer-popup-text = Es besteht das Risiko, dass ein Geschäft einen Insolven
 disclaimer-popup-more = mehr
 disclaimer-popup-dismiss = Nicht mehr anzeigen
 
-twitter-placeholder-text = Support your local businesses during the COVID-19 pandemic.
+twitter-placeholder-text = Unterstütze geschlossene Cafés, Bars, Restaurants & Geschäfte durch den Kauf von Gutscheinen! %23supportyourlocal %23zusammengegencorona
 
-share-on-facebook = Share on Facebook
-share-on-twitter = Share on Twitter
+share-on-facebook = Auf Facebook teilen
+share-on-twitter = Auf Twitter teilen
+share-on-whatsapp = Auf WhatsApp teilen
 
-thanks-for-supporting = Thanks for supporting <strong>{ $business-name }</strong> - spread the word and ask friends to support as well!
+thanks-for-supporting = Vielen Dank, dass Du <strong>{ $business-name }</strong> unterstützt! Rufe jetzt Deine Freunde auf, auch zu helfen #supportyourlocal

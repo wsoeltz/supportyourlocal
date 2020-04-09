@@ -2,7 +2,8 @@ import { useQuery } from '@apollo/react-hooks';
 import {
   faFacebookSquare,
   faInstagram,
-  faTwitterSquare,
+  faTwitter,
+  faWhatsapp,
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBars,
@@ -528,12 +529,12 @@ const ShareContent = styled.div`
 `;
 const ShareButtons = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
 `;
 
 const ShareButtonBase = styled.button`
   font-size: 0.9rem;
-  padding: 0.5rem;
+  padding: 0.5rem 0.7rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -550,10 +551,17 @@ const FacebookShareButton = styled(ShareButtonBase)`
 `;
 const TwitterShareButton = styled(ShareButtonBase)`
   background-color: #1DA1F2;
-  border-bottom-right-radius: ${borderRadius}px;
 
   &:hover {
     background-color: ${lighten(0.1, '#1DA1F2')};
+  }
+`;
+const WhatsAppShareButton = styled(ShareButtonBase)`
+  background-color: #25D366;
+  border-bottom-right-radius: ${borderRadius}px;
+
+  &:hover {
+    background-color: ${lighten(0.1, '#25D366')};
   }
 `;
 const ThanksModalText = styled.p`
@@ -921,9 +929,16 @@ const LandingPage = () => {
   const twitterShare = () => {
     window.open(
         'http://www.twitter.com/share?text=' +
-          getFluentString('twitter-placeholder-text') + ' %23supportyourlocal' +
+          getFluentString('twitter-placeholder-text') +
           '&url=https://www.supportyourlocal.online/',
         'twitter-share-dialog',
+        'width=626,height=436',
+    );
+  };
+  const whatsAppShare = () => {
+    window.open(
+        'https://api.whatsapp.com/send?text=%23supportyourlocal%20-%20Unterst%C3%BCtze%20Deine%20Lieblingsorte%20https%3A%2F%2Fwww.supportyourlocal.online%2F',
+        'whatsapp-share-dialog',
         'width=626,height=436',
     );
   };
@@ -945,14 +960,18 @@ const LandingPage = () => {
         />
       </ShareContent>
       <ShareButtons>
-        <FacebookShareButton onClick={facebookShare}>
+        <FacebookShareButton onClick={facebookShare} data-clickout='facebook'>
           <ShareIcon icon={faFacebookSquare} />
           {getFluentString('share-on-facebook')}
         </FacebookShareButton>
-        <TwitterShareButton onClick={twitterShare}>
-          <ShareIcon icon={faTwitterSquare} />
+        <TwitterShareButton onClick={twitterShare} data-clickout='twitter'>
+          <ShareIcon icon={faTwitter} />
           {getFluentString('share-on-twitter')}
         </TwitterShareButton>
+        <WhatsAppShareButton onClick={whatsAppShare} data-clickout='whatsapp'>
+          <ShareIcon icon={faWhatsapp} />
+          {getFluentString('share-on-whatsapp')}
+        </WhatsAppShareButton>
       </ShareButtons>
     </Modal>
   );
