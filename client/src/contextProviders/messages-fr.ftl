@@ -43,9 +43,10 @@ disclaimer-popup-text = There is a risk that a business will have to file for ba
 disclaimer-popup-more = more
 disclaimer-popup-dismiss = Don't show me this again
 
-twitter-placeholder-text = Support your local businesses during the COVID-19 pandemic.
+twitter-placeholder-text = Support your local businesses during the COVID-19 pandemic. %23supportyourlocal
 
 share-on-facebook = Share on Facebook
 share-on-twitter = Share on Twitter
+share-on-whatsapp = Share on WhatsApp
 
 thanks-for-supporting = Thanks for supporting <strong>{ $business-name }</strong> - spread the word and ask friends to support as well!
