@@ -34,10 +34,10 @@ search-text-missing-shop = <strong>Tipp:</strong> Auf <a href="https://www.kaufn
 
 search-text-no-results-donate = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank" data-clickout="kaufnebenan">kaufnebenan.de</a> kannst Du auch Gutscheine für Geschäfte kaufen, die noch keinen Gutschein-Shop haben!
 
-popup-text-title = Together we are strong
-popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
-popup-text-para-2 = #supportyourlocal is a non-profit initiative supporting that.
-popup-button-text = Learn More
+popup-text-title = Gemeinsam sind wir stark
+popup-text-para-1 = Das Coronavirus trifft die Gesellschaft hart. Viele Kleinunternehmer müssen schließen, können jedoch nicht Wochen ohne Umsatz überleben.
+popup-text-para-2 = Unterstütze sie jetzt. #supportyourlocal
+popup-button-text = Mehr erfahren
 
 disclaimer-popup-text = Es besteht das Risiko, dass ein Geschäft einen Insolvenzantrag stellen muss und eine Einlösung und/oder eine Rückzahlung eines gekauften Gutscheins nicht erfolgen wird. #supportyourlocal schliesst jegliche Haftung aus.
 disclaimer-popup-more = mehr
