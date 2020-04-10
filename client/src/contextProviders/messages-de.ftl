@@ -35,7 +35,7 @@ search-text-missing-shop = <strong>Tipp:</strong> Auf <a href="https://www.kaufn
 search-text-no-results-donate = <strong>Tipp:</strong> Auf <a href="https://www.kaufnebenan.de/donations" target="_blank" data-clickout="kaufnebenan">kaufnebenan.de</a> kannst Du auch Gutscheine für Geschäfte kaufen, die noch keinen Gutschein-Shop haben!
 
 popup-text-title = Gemeinsam sind wir stark
-popup-text-para-1 = Das Coronavirus trifft die Gesellschaft hart. Viele Kleinunternehmer müssen schließen, können jedoch nicht Wochen ohne Umsatz überleben.
+popup-text-para-1 = Das Coronavirus trifft die Gesellschaft hart. Viele Kleinunternehmer müssen schließen, können jedoch nicht Wochen ohne Umsatz überleben. Unterstütze Sie jetzt und kaufe Gutscheine!
 popup-text-para-2 = Unterstütze sie jetzt. #supportyourlocal
 popup-button-text = Mehr erfahren
 

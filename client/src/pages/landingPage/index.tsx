@@ -36,10 +36,12 @@ import {
 import { Content } from '../../styling/Grid';
 import {
   borderRadius,
+  lightBaseColor,
   primaryColor,
   primaryFont,
   secondaryColor,
   secondaryFont,
+  tertiaryColor,
 } from '../../styling/styleUtils';
 import {getDistanceFromLatLonInMiles} from '../../Utils';
 import HeartImageSVGUrl from './heart-image.svg';
@@ -462,66 +464,17 @@ const SocialNavLink = styled(FooterNavLink)`
   border: none;
 `;
 
-const PopupGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr auto;
-
-  @media (max-width: 440px) {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    grid-row-gap: 3rem;
-  }
+const WelcomeContent = styled.div`
+  padding: 1rem 1rem 0.2rem;
+`;
+const DisclaimerContent = styled.div`
+  color: ${lightBaseColor};
+  background-color: ${tertiaryColor};
+  padding: 0.6rem 1rem 0.2rem;
 `;
 
 const PopupTitle = styled.h2`
   margin-top: 0;
-`;
-
-const PopupImg = styled.img`
-  width: 180px;
-  margin: auto;
-`;
-
-const PopupButton = styled.a`
-  padding: 0.3rem 0.4rem;
-  background-color: ${secondaryColor};
-  border: solid 2px ${secondaryColor};
-  color: ${primaryColor};
-  text-decoration: none;
-  text-align: center;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-
-  &:hover {
-    background-color: transparent;
-  }
-
-  @media (max-width: ${mobileWidth}px) {
-    white-space: nowrap;
-    width: 100%;
-    height: 2rem;
-  }
-`;
-
-const PopupButtonSmall = styled(PopupButton)`
-  font-size: 0.8rem;
-  text-transform: uppercase;
-
-  @media (max-width: ${mobileWidth}px) {
-    white-space: normal;
-    width: auto;
-    height: auto;
-  }
-`;
-
-const DisclaimerButtons = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const DissmissButton = styled.button`
-  background-color: transparent;
 `;
 
 const ShareContent = styled.div`
@@ -591,7 +544,6 @@ const GET_ALL_BUSINESS = gql`
   }
 `;
 
-const localStoragePopupHasBeenDismissed = 'localStoragePopupHasBeenDismissed';
 const localStorageDisclaimerHasBeenDismissed = 'localStorageDisclaimerHasBeenDismissed';
 
 interface AllBusinessesSuccess {
@@ -625,8 +577,6 @@ const LandingPage = () => {
   const [windowQuery, setWindowQuery] =
     useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
 
-  const initialPopupState = localStorage.getItem(localStoragePopupHasBeenDismissed);
-  const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
   const initialDisclaimerState = localStorage.getItem(localStorageDisclaimerHasBeenDismissed);
   const [isDisclaimerShown, setIsDisclaimerShown] = useState<boolean>(!initialDisclaimerState);
   const [clickedInfo, setClickedInfo] = useState<BusinessDatum | undefined>(undefined);
@@ -868,70 +818,46 @@ const LandingPage = () => {
   const totalPlacesCount = allBusiness && allBusiness.features.length
     ? allBusiness.features.length : <LoaderSmall color={'#fff'} />;
 
-  const dismissPopup = () => {
-    setIsPopupShown(false);
-  };
-  const dismissPopupPermeneantly = () => {
-    localStorage.setItem(localStoragePopupHasBeenDismissed, 'true');
-    setIsPopupShown(false);
-  };
-
-  const popup = isPopupShown && (!referrer || !referrer.includes('supportyourlocal.online')) ? (
-    <Popup top={0} right={0} width={580} onDismiss={dismissPopup}>
-      <PopupGrid>
-        <div>
-          <PopupTitle>{getFluentString('popup-text-title')}</PopupTitle>
-          <p>
-            {getFluentString('popup-text-para-1')}
-          </p>
-          <p>
-            {getFluentString('popup-text-para-2')}
-          </p>
-          <br />
-          <DisclaimerButtons>
-            <PopupButton href='https://www.supportyourlocal.online/' >
-              {getFluentString('popup-button-text')}
-            </PopupButton>
-            <DissmissButton onClick={dismissPopupPermeneantly}>
-              {getFluentString('disclaimer-popup-dismiss')}
-            </DissmissButton>
-          </DisclaimerButtons>
-        </div>
-        <PopupImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
-      </PopupGrid>
-    </Popup>
-  ) : null;
-
   const dismissDisclaimer = () => {
-    setIsDisclaimerShown(false);
-  };
-  const dismissDisclaimerPermeneantly = () => {
     localStorage.setItem(localStorageDisclaimerHasBeenDismissed, 'true');
     setIsDisclaimerShown(false);
   };
-  const disclaimer = isDisclaimerShown ? (
+
+  const popup = isDisclaimerShown && (!referrer || !referrer.includes('supportyourlocal.online')) ? (
     <Popup
-      bottom={0}
-      right={0}
-      width={300}
-      backgroundColor={'rgba(255, 255, 255, 0.75)'}
+      top={0} right={0} width={580}
       onDismiss={dismissDisclaimer}
     >
-      <p>
-        <small>
-          {getFluentString('disclaimer-popup-text')}
-        </small>
-      </p>
-      <DisclaimerButtons>
-        <PopupButtonSmall href={'https://www.supportyourlocal.online/disclaimer'}>
-          {getFluentString('disclaimer-popup-more')}
-        </PopupButtonSmall>
-        <DissmissButton onClick={dismissDisclaimerPermeneantly}>
-          {getFluentString('disclaimer-popup-dismiss')}
-        </DissmissButton>
-      </DisclaimerButtons>
+      <WelcomeContent>
+        <PopupTitle>{getFluentString('popup-text-title')}</PopupTitle>
+        <p>
+          {getFluentString('popup-text-para-1')}
+        </p>
+      </WelcomeContent>
+      <DisclaimerContent>
+        <p style={{color: '#999'}}>
+          <small>
+            {getFluentString('disclaimer-popup-text')}
+          </small>
+        </p>
+      </DisclaimerContent>
     </Popup>
-  ) : null;
+  ) : (
+    <Popup
+      bottom={0} right={0} width={300}
+      onDismiss={dismissDisclaimer}
+    >
+      <DisclaimerContent>
+        <p>
+          <small>
+            {getFluentString('disclaimer-popup-text')}
+          </small>
+        </p>
+      </DisclaimerContent>
+    </Popup>
+  );
+
+  const disclaimer = isDisclaimerShown ? <>{popup}</> : null;
 
   const facebookShare = () => {
     window.open(
@@ -1048,7 +974,6 @@ const LandingPage = () => {
             />
           </SearchAndResultsContainer>
 
-          {popup}
           {disclaimer}
 
         </ContentContainer>
