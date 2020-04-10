@@ -490,6 +490,7 @@ const PopupButton = styled.a`
   text-decoration: none;
   text-align: center;
   border-radius: 5px;
+  margin-bottom: 1rem;
 
   &:hover {
     background-color: transparent;
@@ -505,7 +506,6 @@ const PopupButton = styled.a`
 const PopupButtonSmall = styled(PopupButton)`
   font-size: 0.8rem;
   text-transform: uppercase;
-  margin-bottom: 1rem;
 
   @media (max-width: ${mobileWidth}px) {
     white-space: normal;
@@ -621,7 +621,9 @@ const LandingPage = () => {
   const getFluentString: GetString = (...args) => localization.getString(...args);
 
   const { lat, lng, tooltipId } = queryString.parse(window.location.search);
-  const [windowQuery, setWindowQuery] = useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
+  const referrer = document.referrer;
+  const [windowQuery, setWindowQuery] =
+    useState<WinodwQuery | undefined>({ lat, lng, tooltipId } as WinodwQuery);
 
   const initialPopupState = localStorage.getItem(localStoragePopupHasBeenDismissed);
   const [isPopupShown, setIsPopupShown] = useState<boolean>(!initialPopupState);
@@ -867,13 +869,14 @@ const LandingPage = () => {
     ? allBusiness.features.length : <LoaderSmall color={'#fff'} />;
 
   const dismissPopup = () => {
+    setIsPopupShown(false);
+  };
+  const dismissPopupPermeneantly = () => {
     localStorage.setItem(localStoragePopupHasBeenDismissed, 'true');
     setIsPopupShown(false);
   };
 
-  const disablePopup = true;
-
-  const popup = isPopupShown && !disablePopup ? (
+  const popup = isPopupShown && (!referrer || !referrer.includes('supportyourlocal.online')) ? (
     <Popup top={0} right={0} width={580} onDismiss={dismissPopup}>
       <PopupGrid>
         <div>
@@ -885,9 +888,14 @@ const LandingPage = () => {
             {getFluentString('popup-text-para-2')}
           </p>
           <br />
-          <PopupButton href='https://www.supportyourlocal.online/' >
-            {getFluentString('popup-button-text')}
-          </PopupButton>
+          <DisclaimerButtons>
+            <PopupButton href='https://www.supportyourlocal.online/' >
+              {getFluentString('popup-button-text')}
+            </PopupButton>
+            <DissmissButton onClick={dismissPopupPermeneantly}>
+              {getFluentString('disclaimer-popup-dismiss')}
+            </DissmissButton>
+          </DisclaimerButtons>
         </div>
         <PopupImg src={HeartImageSVGUrl} alt={getFluentString('popup-text-title')} />
       </PopupGrid>
@@ -902,7 +910,13 @@ const LandingPage = () => {
     setIsDisclaimerShown(false);
   };
   const disclaimer = isDisclaimerShown ? (
-    <Popup bottom={0} right={0} width={300} onDismiss={dismissDisclaimer}>
+    <Popup
+      bottom={0}
+      right={0}
+      width={300}
+      backgroundColor={'rgba(255, 255, 255, 0.75)'}
+      onDismiss={dismissDisclaimer}
+    >
       <p>
         <small>
           {getFluentString('disclaimer-popup-text')}

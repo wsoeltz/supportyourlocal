@@ -35,8 +35,8 @@ search-text-missing-shop = <strong>Tip:</strong> On <a href="https://www.kaufneb
 search-text-no-results-donate = <strong>Tip:</strong> At <a href="https://www.kaufnebenan.de/donations" target="_blank" data-clickout="kaufnebenan">kaufnebenan.de</a> you can also buy vouchers for shops that do not yet have a voucher shop!
 
 popup-text-title = Together we are strong
-popup-text-para-1 = Times are tough, especially for local restaurants, shops, and services. But by buying a voucher now to consume later, we can all help our favorite shops to survive.
-popup-text-para-2 = #supportyourlocal is a non-profit initiative supporting that.
+popup-text-para-1 = The corona virus hits society hard. Many small business owners have to close, but cannot survive weeks without sales.
+popup-text-para-2 = Support them now. #supportyourlocal
 popup-button-text = Learn More
 
 disclaimer-popup-text = There is a risk that a business will have to file for bankruptcy and that a purchased voucher will not be redeemed and / or repaid.

@@ -37,6 +37,7 @@ interface Props {
   left?: string | number;
   right?: string | number;
   width?: string | number;
+  backgroundColor?: string;
   children: React.ReactNode;
   onDismiss: () => void;
 }
@@ -44,12 +45,13 @@ interface Props {
 const Popup = (props: Props) => {
   const {
     top, bottom, left, right, width, children, onDismiss,
+    backgroundColor,
   } = props;
   return (
     <Root
       style={{top, bottom, left, right, width}}
     >
-      <Content>
+      <Content style={{backgroundColor}}>
         {children}
         <DismissButton onClick={onDismiss}>
           ×
