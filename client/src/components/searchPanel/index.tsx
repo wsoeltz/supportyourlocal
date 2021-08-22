@@ -331,8 +331,8 @@ const SearchPanel = (props: Props) => {
         onLinkClick(d);
         updateClickHistory({variables: {id: d.id}});
       };
-      const websiteLink = website
-        ? (
+      const websiteLink = website &&
+        website !== 'false' && website !== 'null' && website !== 'undefined' ? (
             <LinkButton
               onClick={onClick}
               href={website}
@@ -345,7 +345,8 @@ const SearchPanel = (props: Props) => {
           )
         : null;
       let secondaryLink: React.ReactElement<any> | null;
-      if (secondaryUrl) {
+      if (secondaryUrl &&
+          secondaryUrl !== 'false' && secondaryUrl !== 'null' && secondaryUrl !== 'undefined') {
         secondaryLink = (
           <LinkButton
             onClick={onClick}
