@@ -360,7 +360,9 @@ const SearchPanel = (props: Props) => {
       } else {
         secondaryLink = null;
       }
-      const industryElm = industry && industry.length ? (
+      const industryElm =
+        industry && industry.length &&
+        industry !== 'false' && industry !== 'null' && industry !== 'undefined' ? (
         <>
           {industry}
           <br />
